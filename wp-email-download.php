@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Email Download
  * Plugin URI: https://github.com/dwnload/wp-email-download
- * Description: Core functionality for the Beachbody On Demand CMS.
+ * Description: ...
  * Version: 0.1
  * Author:  Austin Passy
  * Author URI: https://austin.passy.co
