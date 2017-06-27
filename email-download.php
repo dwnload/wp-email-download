@@ -22,7 +22,7 @@ if ( version_compare( phpversion(), '7.0.1', '>=' ) ) {
     add_action( 'plugins_loaded', [ ( new \Dwnload\WpEmailDownload\EmailDownload() ), 'addHooks' ] );
     register_activation_hook( __FILE__, '\Dwnload\WpEmailDownload\EmailDownload::activationHook' );
 } else {
-    if ( defined( 'WP_CLI' ) ) {
+    if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {
         WP_CLI::warning( _dwnload_email_download_version_text() );
     } else {
         add_action( 'admin_notices', '_dwnload_email_download_version_error' );
