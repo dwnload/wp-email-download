@@ -1,0 +1,20 @@
+{
+  "name": "dwnload//wp-email-download",
+  "description": "Doesn't do a great deal!",
+  "type": "wordpress-plugin",
+  "authors": [
+    {
+      "name": "Austin Passy",
+      "email": "thefrosty@users.noreply.github.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Dwnload\\WpEmailDownload\\": "src"
+    }
+  },
+  "minimum-stability": "stable"
+}
