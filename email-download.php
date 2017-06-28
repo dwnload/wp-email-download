@@ -13,13 +13,9 @@
  */
 
 if ( version_compare( phpversion(), '7.0.1', '>=' ) ) {
-    // If we haven't loaded this plugin from Composer we need to add our own autoloader
-    if ( ! class_exists( 'Dwnload\WpEmailDownload\EmailDownload' ) ) {
-        $autoloader = require_once 'autoload.php';
-        $autoloader( 'Dwnload\\WpEmailDownload\\', __DIR__ . '/src/' );
-    }
+    require __DIR__ . '/vendor/autoload.php';
 
-    add_action( 'plugins_loaded', [ ( new \Dwnload\WpEmailDownload\EmailDownload() ), 'addHooks' ] );
+    ( new \Dwnload\WpEmailDownload\EmailDownload( new \Dwnload\WpEmailDownload\Init() ) )->hookup();
     register_activation_hook( __FILE__, '\Dwnload\WpEmailDownload\EmailDownload::activationHook' );
 } else {
     if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {
