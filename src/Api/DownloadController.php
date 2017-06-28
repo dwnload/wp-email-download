@@ -64,7 +64,7 @@ class DownloadController extends RegisterPostRoute {
             return new WP_REST_Response( $data, \WP_Http::OK );
         }
 
-        $chimp = new MailChimp( '1787e8cd321826254707222278847628-us6' );
+        $chimp = new MailChimp( '' );
         $list_id = $params[ Mailchimp::LIST_ID ];
         $subscriber_hash = $chimp->subscriberHash( sanitize_email( $params[ self::ROUTE_REQUIRED_FIELD ] ) );
         $response = $chimp->get( "lists/$list_id/members/$subscriber_hash" );

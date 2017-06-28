@@ -32,6 +32,6 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
      * @return string
      */
     public function getListId(): string {
-        return 'c69310a8ba';
+        return '';
     }
 }
