@@ -9,7 +9,9 @@
     }
   ],
   "require": {
-    "php": ">=7.0.4"
+    "php": ">=7.0.4",
+    "drewm/mailchimp-api": "2.4",
+    "egulias/email-validator": "~2.1"
   },
   "autoload": {
     "psr-4": {
