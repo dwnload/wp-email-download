@@ -16,10 +16,12 @@ trait ShortcodeUiTrait {
      * @throws \Exception
      */
     protected function addActionRegisterShortcodeUi() {
-        if ( ! function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
-            throw new \Exception( 'Shortcake plugin needs to be activated to use ' . __METHOD__ );
-        }
-        add_action( 'register_shortcode_ui', [ $this, 'registerShortcodeUI' ] );
+        add_action( 'plugins_loaded', function() {
+            if ( ! function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
+                throw new \Exception( 'Shortcake plugin needs to be activated to use ' . __METHOD__ );
+            }
+            add_action( 'register_shortcode_ui', [ $this, 'registerShortcodeUI' ] );
+        } );
     }
 
     /**
