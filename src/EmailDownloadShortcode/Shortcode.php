@@ -22,6 +22,7 @@ class Shortcode implements ShortcodeInterface {
     public function __construct( string $tag, ShortcodeHandler $handler ) {
         $this->tag = $tag;
         $this->handler = $handler;
+        $this->handler->setTag( $tag );
     }
 
     /**

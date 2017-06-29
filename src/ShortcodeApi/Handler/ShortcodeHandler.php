@@ -10,11 +10,16 @@ namespace Dwnload\WpEmailDownload\ShortcodeApi\Handler;
 interface ShortcodeHandler {
 
     /**
+     * @param string $tag
+     */
+    public function setTag( string $tag );
+
+    /**
      * Returns the array of defaults for the shortcode's attributes
      *
      * @return array
      */
-    public function getDefaults(): array ;
+    public function getDefaults(): array;
 
     /**
      * Returns the html that WordPress will display to the user.
@@ -29,5 +34,5 @@ interface ShortcodeHandler {
      *
      * @return string
      */
-    public function handler( $atts, $content, $tag ): string ;
+    public function handler( $atts, $content, $tag ): string;
 }
