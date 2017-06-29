@@ -12,7 +12,6 @@ use Dwnload\WpEmailDownload\WpHooksInterface;
 class Settings extends AbstractSettings implements WpHooksInterface {
 
     const SETTINGS_PAGE_SLUG = 'dwnload-email-download';
-    const OBJECT_NAME = 'EmailDownload';
 
     /**
      * Add class hooks.
