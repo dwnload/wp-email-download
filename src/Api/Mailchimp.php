@@ -25,11 +25,46 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
     }
 
     /**
-     * Get the list ID from the shortcode.
      *
      * @return string
      */
-    public function getLists(): string {
+    public function getListsHtml(): string {
+        $html = esc_html__( 'Error connecting to MailChimp.', 'email-download' );
+        $response = $this->getLists();
+
+        if ( isset( $response['lists'] ) ) {
+            $html = '<ul style="margin: 0">';
+            foreach ( $response['lists'] as $list ) {
+                $array[ $list['id'] ] = $list['name'];
+                $html .= "<li>{$list['name']} ({$list['id']})</li>";
+            }
+            $html .= '</ul>';
+        }
+
+        return $html;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getListsArray(): array {
+        $array = [];
+        $response = $this->getLists();
+
+        if ( isset( $response['lists'] ) ) {
+            foreach ( $response['lists'] as $list ) {
+                $array[ $list['id'] ] = $list['name'];
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLists(): array {
         $reflection = new \ReflectionClass( parent::class );
         $api_key = $reflection->getProperty( 'api_key' );
         $api_key->setAccessible( true );
@@ -43,16 +78,6 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
             }
         }
 
-        $html = esc_html__( 'Error connecting to MailChimp.', 'email-download' );
-
-        if ( isset( $response['lists'] ) ) {
-            $html = '<ul style="margin: 0">';
-            foreach ( $response['lists'] as $list ) {
-                $html .= "<li>{$list['name']} ({$list['id']})</li>";
-            }
-            $html .= '</ul>';
-        }
-
-        return $html;
+        return $response;
     }
 }

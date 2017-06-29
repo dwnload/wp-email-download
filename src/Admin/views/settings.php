@@ -32,7 +32,7 @@ if ( ! ( $this instanceof Settings ) ) {
                     <td>
                         <?php
                         try {
-                            echo ( new MailChimp( $api_key ) )->getLists();
+                            echo ( new MailChimp( $api_key ) )->getListsHtml();
                         } catch ( Exception $e ) {
                             echo "<span class=\"description\">{$e->getMessage()}</span>";
                         } ?>
