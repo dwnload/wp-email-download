@@ -55,7 +55,7 @@ class EmailDownload {
 
         $this->getInit()
              ->add( new DownloadController( $settings ) )
-             ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler() ) ) )
+             ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $settings ) ) ) )
              ->initialize();
     }
 

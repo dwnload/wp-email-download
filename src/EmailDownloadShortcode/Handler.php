@@ -2,9 +2,12 @@
 
 namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
+use Dwnload\WpEmailDownload\Admin\Settings;
+use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
 use function Dwnload\WpEmailDownload\admin_notice;
+use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
 
 /**
  * Class EmailDownloadHandler
@@ -20,17 +23,30 @@ class Handler implements ShortcodeHandler {
     const MAX_LINE_HEIGHT = "20";
     const ATTRIBUTE_NAME = "lines";
 
+    /** @var Settings $settings */
+    protected $settings;
+
+    /** @var string $tag */
+    protected $tag;
+
     /**
      * Handler constructor.
+     *
+     * @param Settings $settings
      */
-    public function __construct() {
+    public function __construct( Settings $settings ) {
         try {
             $this->addActionRegisterShortcodeUi();
+            $this->settings = $settings;
         } catch ( \Exception $e ) {
             add_action( 'admin_notices', function() {
-                admin_notice( esc_html__( 'Email Download plugin error: ', 'email-download' ) );
+                admin_notice( missing_shorcode_ui_text(), 'warning' );
             } );
         }
+    }
+
+    public function setTag( string $tag ) {
+        $this->tag = $tag;
     }
 
     /**
@@ -74,47 +90,38 @@ class Handler implements ShortcodeHandler {
     public function registerShortcodeUI() {
         $fields = [
             [
-                'label' => esc_html__( 'Program ID', 'bbl.wpadmin' ),
-                'description' => esc_html__( 'Message for when a user has already purchased a specific workshop.', 'bbl.wpadmin' ),
-                'attr' => 'program-id',
+                'label' => esc_html__( 'Mailchimp List ID', 'email-download' ),
+                'description' => esc_html__( 'Message for when a user has already purchased a specific workshop.', 'email-download' ),
+                'attr' => 'list-id',
                 'type' => 'select',
-                'options' => $this->getPrograms(),
-            ],
-            [
-                'label' => esc_html__( 'Product ID', 'bbl.wpadmin' ),
-                'description' => esc_html__( 'Message for when a user has already enrolled in PRO Team.', 'bbl.wpadmin' ),
-                'attr' => 'product-id',
-                'type' => 'select',
-                'options' => $this->getProducts(),
-            ],
-            [
-                'label' => esc_html__( 'Template Type', 'bbl.wpadmin' ),
-                'description' => esc_html__( 'Button type: 1 for instructor-agnostic page and 2 for instaructors-only page.', 'bbl.wpadmin' ),
-                'attr' => 'template-id',
-                'type' => 'select',
-                'options' => [ 1, 2 ],
-            ],
-            [
-                'label' => esc_html__( 'Button label 1', 'bbl.wpadmin' ),
-                'description' => esc_html__( 'Custom button label 1.', 'bbl.wpadmin' ),
-                'attr' => 'button-label1',
-                'type' => 'text',
-            ],
-            [
-                'label' => esc_html__( 'Button label 2', 'bbl.wpadmin' ),
-                'description' => esc_html__( 'Custom button label 2.', 'bbl.wpadmin' ),
-                'attr' => 'button-label2',
-                'type' => 'text',
+                'options' => $this->getMailchimpLists(),
             ],
         ];
         $shortcode_ui_args = [
-            'label' => esc_html__( 'PRO Team Sign-up shortcode', 'bbl.wpadmin' ),
-            'listItemImage' => 'dashicons-awards',
+            'label' => esc_html__( 'Email Download shortcode', 'email-download' ),
+            'listItemImage' => 'dashicons-download',
             'post_type' => [ 'page' ],
             'attrs' => $fields,
         ];
 
         $this->shortcodeUiRegisterShortcode( $this->tag, $shortcode_ui_args );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getMailchimpLists(): array {
+        $options = [ '0' => 'No Lists found.' ];
+
+        if ( ! empty( $api_key = $this->settings->getSetting( Mailchimp::SETTING_API_KEY ) ) ) {
+            try {
+                return ( new MailChimp( $api_key ) )->getListsArray();
+            } catch ( \Exception $e ) {
+                return $options;
+            }
+        }
+
+        return $options;
     }
 
     /**
@@ -129,7 +136,7 @@ class Handler implements ShortcodeHandler {
      */
     protected function validateLinesAttribute( $lines_attribute ) {
         return $lines_attribute === filter_var( $lines_attribute, FILTER_SANITIZE_NUMBER_INT ) &&
-               (int) $lines_attribute >= 1 && (int) $lines_attribute <= self::MAX_LINE_HEIGHT;
+            (int)$lines_attribute >= 1 && (int)$lines_attribute <= self::MAX_LINE_HEIGHT;
     }
 
     /**
