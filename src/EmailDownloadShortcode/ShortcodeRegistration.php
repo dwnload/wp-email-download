@@ -18,6 +18,9 @@ class ShortcodeRegistration extends AbstractShortcode implements WpHooksInterfac
      */
     protected $shortcode;
 
+    /** @var string $property */
+    private $property = 'tag';
+
     /**
      * BasicShortcodeRegistration constructor.
      *
@@ -25,6 +28,9 @@ class ShortcodeRegistration extends AbstractShortcode implements WpHooksInterfac
      */
     public function __construct( ShortcodeInterface $shortcode ) {
         $this->shortcode = $shortcode;
+        if ( ! property_exists( $this->shortcode, $this->property ) ) {
+            $this->shortcode->{$this->property} = $this->shortcode->getTag();
+        }
     }
 
     public function addHooks() {

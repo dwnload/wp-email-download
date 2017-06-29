@@ -16,7 +16,10 @@
   "autoload": {
     "psr-4": {
       "Dwnload\\WpEmailDownload\\": "src"
-    }
+    },
+    "files": [
+      "src/includes/functions.php"
+    ]
   },
   "minimum-stability": "stable"
 }

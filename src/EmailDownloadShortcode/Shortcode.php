@@ -7,14 +7,10 @@ use Dwnload\WpEmailDownload\ShortcodeApi\ShortcodeInterface;
 
 class Shortcode implements ShortcodeInterface {
 
-    /**
-     * @var string $tag
-     */
+    /** @var string $tag */
     protected $tag;
 
-    /**
-     * @var ShortcodeHandler $handler
-     */
+    /**  @var ShortcodeHandler $handler */
     protected $handler;
 
     /**

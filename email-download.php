@@ -15,28 +15,16 @@
 if ( version_compare( phpversion(), '7.0.1', '>=' ) ) {
     require __DIR__ . '/vendor/autoload.php';
 
-    ( new \Dwnload\WpEmailDownload\EmailDownload( new \Dwnload\WpEmailDownload\Init() ) )->hookup();
+    ( new \Dwnload\WpEmailDownload\EmailDownload(
+        new \Dwnload\WpEmailDownload\Init(),
+        __FILE__
+    ) )->hookup();
     register_activation_hook( __FILE__, '\Dwnload\WpEmailDownload\EmailDownload::activationHook' );
 } else {
+    require __DIR__ . '/src/includes/functions.php';
     if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {
-        WP_CLI::warning( _dwnload_email_download_version_text() );
+        WP_CLI::warning( \Dwnload\WpEmailDownload\php_version_text() );
     } else {
-        add_action( 'admin_notices', '_dwnload_email_download_version_error' );
+        add_action( 'admin_notices', '\Dwnload\WpEmailDownload\version_error' );
     }
-}
-
-/**
- * Admin notice for incompatible versions of PHP.
- */
-function _dwnload_email_download_version_error() {
-    printf( '<div class="error"><p>%s</p></div>', esc_html( _dwnload_email_download_version_text() ) );
-}
-
-/**
- * String describing the minimum PHP version.
- *
- * @return string
- */
-function _dwnload_email_download_version_text() {
-    return __( 'Email Download plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 7.0 or higher.', 'email-download' );
 }
