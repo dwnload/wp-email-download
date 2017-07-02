@@ -18,10 +18,8 @@ class Handler implements ShortcodeHandler {
 
     use ShortcodeUiTrait;
 
-    const HEIGHT_SPACER_CSS_CLASS_PREFIX = 'bb-blog-height-spacer--lines-';
-    const DEFAULT_LINE_HEIGHT = "3";
-    const MAX_LINE_HEIGHT = "20";
-    const ATTRIBUTE_NAME = "lines";
+    const ATTRIBUTE_LIST_ID = 'list-id';
+    const ATTRIBUTE_FILE = 'file';
 
     /** @var Settings $settings */
     protected $settings;
@@ -55,7 +53,10 @@ class Handler implements ShortcodeHandler {
      * @return array
      */
     public function getDefaults(): array {
-        return [ self::ATTRIBUTE_NAME => self::DEFAULT_LINE_HEIGHT ];
+        return [
+            self::ATTRIBUTE_LIST_ID => '',
+            self::ATTRIBUTE_FILE => '',
+        ];
     }
 
     /**
@@ -75,26 +76,38 @@ class Handler implements ShortcodeHandler {
     public function handler( $atts, $content = '', $tag ): string {
         $parsed_atts = shortcode_atts( $this->getDefaults(), $atts );
 
-        $line_height = $parsed_atts[ self::ATTRIBUTE_NAME ];
-        $error_message = $this->validateLinesAttribute( $line_height ) ? "" :
-            sprintf(
-                __( 'The "%s" attribute for Beachbody Blog height spacer shortcode must be an integer between 1-%d. The 
-                default value is %d', 'bb-blog' ),
-                self::ATTRIBUTE_NAME,
-                self::MAX_LINE_HEIGHT,
-                self::DEFAULT_LINE_HEIGHT );
+        $list_id = $parsed_atts[ self::ATTRIBUTE_LIST_ID ];
+        if ( empty( $list_id ) ) {
+            return 'Please provide a List ID.';
+        }
 
-        return "<div class='{$this->getHeightSpacerCSSClassPrefix()}{$line_height}'>{$error_message}</div>";
+        $file = $parsed_atts[ self::ATTRIBUTE_FILE ];
+        if ( empty( $file ) ) {
+            return 'Please provide a file.';
+        }
+
+        ob_start();
+        include __DIR__ . '/views/form.php';
+        $content = ob_get_contents();
+        ob_get_clean();
+
+        return $content;
     }
 
     public function registerShortcodeUI() {
         $fields = [
             [
                 'label' => esc_html__( 'Mailchimp List ID', 'email-download' ),
-                'description' => esc_html__( 'Message for when a user has already purchased a specific workshop.', 'email-download' ),
-                'attr' => 'list-id',
+                'description' => esc_html__( 'The list which a user needs to be subscribed to before gaining access to download.', 'email-download' ),
+                'attr' => self::ATTRIBUTE_LIST_ID,
                 'type' => 'select',
                 'options' => $this->getMailchimpLists(),
+            ],
+            [
+                'label' => esc_html__( 'File', 'email-download' ),
+                'description' => esc_html__( 'The attachment.', 'email-download' ),
+                'attr' => 'file',
+                'type' => 'attachment',
             ],
         ];
         $shortcode_ui_args = [
@@ -122,30 +135,5 @@ class Handler implements ShortcodeHandler {
         }
 
         return $options;
-    }
-
-    /**
-     * Validates the value of the "lines" attribute.
-     *
-     * We expect the "lines" attribute to be a string that is an integer between 1 and the maximum
-     * number of lines we support in the css.
-     *
-     * @param string $lines_attribute
-     *
-     * @return bool
-     */
-    protected function validateLinesAttribute( $lines_attribute ) {
-        return $lines_attribute === filter_var( $lines_attribute, FILTER_SANITIZE_NUMBER_INT ) &&
-            (int)$lines_attribute >= 1 && (int)$lines_attribute <= self::MAX_LINE_HEIGHT;
-    }
-
-    /**
-     * We need to wrap the class constant for the css class prefix for the height spacer since PHP
-     * does not allow the use of constants in variable parsing in strings.
-     *
-     * @return string
-     */
-    protected function getHeightSpacerCSSClassPrefix() {
-        return self::HEIGHT_SPACER_CSS_CLASS_PREFIX;
     }
 }
