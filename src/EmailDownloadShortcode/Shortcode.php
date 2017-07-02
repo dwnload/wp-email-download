@@ -23,6 +23,9 @@ class Shortcode implements ShortcodeInterface {
         $this->tag = $tag;
         $this->handler = $handler;
         $this->handler->setTag( $tag );
+        if ( method_exists( $this->handler, 'pluginsLoaded' ) ) {
+            $this->handler->pluginsLoaded();
+        }
     }
 
     /**
