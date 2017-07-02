@@ -33,14 +33,23 @@ class Handler implements ShortcodeHandler {
      * @param Settings $settings
      */
     public function __construct( Settings $settings ) {
-        try {
-            $this->addActionRegisterShortcodeUi();
-            $this->settings = $settings;
-        } catch ( \Exception $e ) {
-            add_action( 'admin_notices', function() {
-                admin_notice( missing_shorcode_ui_text(), 'warning' );
-            } );
-        }
+        $this->settings = $settings;
+    }
+
+    /**
+     * Initiate the registration of the Shorcode UI on plugins_loaded
+     * so we can catch the Exception if the plugin isn't installed or activated.
+     */
+    public function pluginsLoaded() {
+        add_action( 'plugins_loaded', function() {
+            try {
+                $this->addActionRegisterShortcodeUi();
+            } catch ( \Exception $e ) {
+                add_action( 'admin_notices', function() {
+                    admin_notice( missing_shorcode_ui_text(), 'warning' );
+                } );
+            }
+        } );
     }
 
     public function setTag( string $tag ) {

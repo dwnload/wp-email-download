@@ -10,6 +10,16 @@ namespace Dwnload\WpEmailDownload\ShortcodeApi\Handler;
 trait ShortcodeUiTrait {
 
     /**
+     * Required registerShortcodeUI method.
+     */
+    abstract public function registerShortcodeUI();
+
+    /**
+     * Required pluginsLoaded method.
+     */
+    abstract public function pluginsLoaded();
+
+    /**
      * Register shortcode ui method `registerShortcodeUI()` on the
      * custom 'register_shortcode_ui' action hook.
      *
@@ -21,11 +31,6 @@ trait ShortcodeUiTrait {
         }
         add_action( 'register_shortcode_ui', [ $this, 'registerShortcodeUI' ] );
     }
-
-    /**
-     * Required registerShortcodeUI method.
-     */
-    abstract public function registerShortcodeUI();
 
     /**
      * Helper to register the Shortcode UI for shortcode callback using Shotcode UI.
