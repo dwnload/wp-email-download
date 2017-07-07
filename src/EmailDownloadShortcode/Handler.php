@@ -71,11 +71,6 @@ class Handler implements ShortcodeHandler {
     /**
      * Returns the html for the height spacer.
      *
-     * The requirement was to not use inline style. The css for the class is defined in the scss
-     * directory. Since the html is a one liner, it didn't make sense to put it into a template. If
-     * it gets more complex, a template should be created. The class names only support line
-     * heights from 1 - 20.
-     *
      * @param array|string $atts
      * @param string $content
      * @param string $tag
@@ -97,8 +92,7 @@ class Handler implements ShortcodeHandler {
 
         ob_start();
         include __DIR__ . '/views/form.php';
-        $content = ob_get_contents();
-        ob_get_clean();
+        $content = ob_get_clean();
 
         return $content;
     }
