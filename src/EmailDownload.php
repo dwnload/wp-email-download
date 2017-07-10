@@ -15,8 +15,6 @@ use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
  */
 class EmailDownload {
 
-    const ROUTE_NAMESPACE = 'dwnload/v1';
-
     /**
      * @var Init $init
      */

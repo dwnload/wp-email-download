@@ -19,7 +19,7 @@ class ShortcodeRegistration extends AbstractShortcode implements WpHooksInterfac
     protected $shortcode;
 
     /**
-     * BasicShortcodeRegistration constructor.
+     * ShortcodeRegistration constructor.
      *
      * @param ShortcodeInterface $shortcode
      */

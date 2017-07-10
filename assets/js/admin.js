@@ -1,3 +1,4 @@
-jQuery(function ($) {
+/* global jQuery */
+(function ($) {
 
-});
+}(jQuery));

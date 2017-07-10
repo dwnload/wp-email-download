@@ -4,6 +4,7 @@ namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
+use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
 use function Dwnload\WpEmailDownload\admin_notice;
@@ -20,6 +21,10 @@ class Handler implements ShortcodeHandler {
 
     const ATTRIBUTE_LIST_ID = 'list-id';
     const ATTRIBUTE_FILE = 'file';
+    const SCRIPT_HANDLE = 'email-download';
+
+    /** @var array $atts */
+    protected $atts = [];
 
     /** @var Settings $settings */
     protected $settings;
@@ -50,8 +55,12 @@ class Handler implements ShortcodeHandler {
                 } );
             }
         } );
+        add_action( 'wp_enqueue_scripts', [ $this, 'registerScripts' ] );
     }
 
+    /**
+     * @param string $tag
+     */
     public function setTag( string $tag ) {
         $this->tag = $tag;
     }
@@ -69,6 +78,13 @@ class Handler implements ShortcodeHandler {
     }
 
     /**
+     * @return string
+     */
+    public function getAttribute( string $attr ): string {
+        return $this->atts[ $attr ] ?? '';
+    }
+
+    /**
      * Returns the html for the height spacer.
      *
      * @param array|string $atts
@@ -78,7 +94,7 @@ class Handler implements ShortcodeHandler {
      * @return string
      */
     public function handler( $atts, $content = '', $tag ): string {
-        $parsed_atts = shortcode_atts( $this->getDefaults(), $atts );
+        $this->atts = $parsed_atts = shortcode_atts( $this->getDefaults(), $atts );
 
         $list_id = $parsed_atts[ self::ATTRIBUTE_LIST_ID ];
         if ( empty( $list_id ) ) {
@@ -88,6 +104,13 @@ class Handler implements ShortcodeHandler {
         $file = $parsed_atts[ self::ATTRIBUTE_FILE ];
         if ( empty( $file ) ) {
             return 'Please provide a file.';
+        }
+
+        if ( wp_style_is( self::SCRIPT_HANDLE, 'registered' ) ) {
+            wp_enqueue_style( self::SCRIPT_HANDLE );
+        }
+        if ( wp_script_is( self::SCRIPT_HANDLE, 'registered' ) ) {
+            wp_enqueue_script( self::SCRIPT_HANDLE );
         }
 
         ob_start();
@@ -121,6 +144,10 @@ class Handler implements ShortcodeHandler {
         ];
 
         $this->shortcodeUiRegisterShortcode( $this->tag, $shortcode_ui_args );
+    }
+
+    public function registerScripts() {
+        wp_register_style( self::SCRIPT_HANDLE, plugins_url( 'assets/css/style.css', EmailDownload::getFile() ) );
     }
 
     /**

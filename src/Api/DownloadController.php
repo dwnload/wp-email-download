@@ -19,7 +19,12 @@ use WP_REST_Response;
  */
 class DownloadController extends RegisterPostRoute {
 
+    const NONCE_ACTION = 'wp_rest';
+    const ROUTE_NAMESPACE = 'dwnload/v1';
+    const ROUTE_ROUTE_PREFIX = '/user/';
     const ROUTE_REQUIRED_FIELD = 'email';
+    const SCRIPT_HANDLE = 'email-download';
+    const OBJECT_NAME = 'emailDownload';
 
     /** @var  Settings $settings */
     protected $settings;
@@ -33,14 +38,41 @@ class DownloadController extends RegisterPostRoute {
         $this->settings = $settings;
     }
 
+    public function addHooks() {
+        parent::addHooks();
+        add_action( 'wp_enqueue_scripts', [ $this, 'registerScripts' ] );
+    }
+
+    /**
+     * Register Api scripts.
+     */
+    public function registerScripts() {
+        wp_register_script(
+            self::SCRIPT_HANDLE,
+            plugins_url( 'assets/js/email-download.js', EmailDownload::getFile() ),
+            [ 'jquery' ]
+        );
+
+        wp_localize_script( self::SCRIPT_HANDLE, self::OBJECT_NAME, [
+                'root' => esc_url_raw( rest_url() ),
+                'namespace' => self::ROUTE_NAMESPACE,
+                'route' => self::ROUTE_ROUTE_PREFIX,
+                'nonce' => wp_create_nonce( self::NONCE_ACTION ),
+                'success' => __( 'Thanks for your submission!', 'your-text-domain' ),
+                'failure' => __( 'Your submission could not be processed.', 'your-text-domain' ),
+                'current_user_id' => get_current_user_id(),
+            ]
+        );
+    }
+
     /**
      * Registers a REST API route.
      */
     public function initializeRoute() {
         $this->registerRoute(
-            EmailDownload::ROUTE_NAMESPACE,
-            "/user/(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
-            [ $this, 'index' ],
+            self::ROUTE_NAMESPACE,
+            self::ROUTE_ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
+            [ $this, 'validateUserEmailSubscription' ],
             [
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
@@ -65,7 +97,7 @@ class DownloadController extends RegisterPostRoute {
      *
      * @return WP_REST_Response|mixed
      */
-    public function index( WP_REST_Request $request ) {
+    public function validateUserEmailSubscription( WP_REST_Request $request ) {
         $data = [
             'access' => false,
             'date' => date( 'Y-m-d H:i:s' ),
@@ -73,7 +105,7 @@ class DownloadController extends RegisterPostRoute {
 
         // Required parameters (though the 'email' field is required by the route
         if ( empty( $request->get_param( self::ROUTE_REQUIRED_FIELD ) ) ||
-             empty( $request->get_param( Mailchimp::LIST_ID ) )
+            empty( $request->get_param( Mailchimp::LIST_ID ) )
         ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_params',
@@ -81,16 +113,21 @@ class DownloadController extends RegisterPostRoute {
             ) );
         }
 
-        if ( empty( $api_key = $this->settings->getSetting( Mailchimp::SETTING_API_KEY ) ) ) {
+        if ( empty( $api_key = $this->settings->getSettings()[ Mailchimp::SETTING_API_KEY ] ) ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_api_key',
-                'A MailChimp API Key is required to complete this request.'
+                'A MailChimp API Key is required to complete this request. ' . $api_key
             ) );
         }
 
         try {
             $chimp = new MailChimp( $api_key );
-            $list_id = $request->get_param( Mailchimp::LIST_ID );
+            $list_id = $chimp->decrypt( $request->get_param( Mailchimp::LIST_ID ) );
+            error_log( wp_json_encode( [
+                'before' => $request->get_param( Mailchimp::LIST_ID ),
+                'after' => $list_id,
+                'header' => $request->get_header( 'X-WP-Nonce' ),
+            ] ) );
             $subscriber = $chimp->subscriberHash( $request->get_param( self::ROUTE_REQUIRED_FIELD ) );
             $response = $chimp->get( "lists/$list_id/members/$subscriber" );
 
