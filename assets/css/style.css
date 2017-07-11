@@ -22,6 +22,9 @@
     z-index: 0;
 }
 
+/**
+ * @link https://stackoverflow.com/a/35408000/558561
+ */
 .EmailDownload__input:focus + .EmailDownload__label,
 .EmailDownload__input:not([value=""]):not(:focus) + .EmailDownload__label {
     bottom: 95%;

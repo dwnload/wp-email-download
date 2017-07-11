@@ -21,6 +21,7 @@ if ( ! ( $this instanceof Handler ) ) {
                     <input name="email" class="EmailDownload__input" id="EmailDownload__field-email"
                            onfocus="if ( this.placeholder === 'Email Address') { this.placeholder = ''; }"
                            onblur="if ( this.placeholder === '' ) { this.placeholder = 'Email Address'; }"
+                           onkeyup="this.setAttribute('value', this.value);"
                            type="email"
                            placeholder="Email Address"
                            value=""
