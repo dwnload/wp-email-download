@@ -1,6 +1,7 @@
 .EmailDownload__wrapper {
     margin-bottom: 1.5rem;
 }
+
 .EmailDownload__group {
     margin-bottom: 20px;
     padding: 4px 0;
@@ -12,17 +13,18 @@
 }
 
 .EmailDownload__label {
-    position: absolute;
+    font-size: 80%;
     opacity: 0;
-    transition: 550ms bottom, 200ms opacity;
+    position: absolute;
+    transition: 2s bottom, 250ms opacity;
     bottom: 0;
     left: 0;
     z-index: 0;
 }
 
-.EmailDownload__input:focus + .EmailDownload__label {
+.EmailDownload__input:focus + .EmailDownload__label,
+.EmailDownload__input:not([value=""]):not(:focus) + .EmailDownload__label {
     bottom: 95%;
-    font-size: 80%;
     opacity: 1;
-    transition: 215ms bottom, 335ms opacity;
+    transition: 200ms bottom, 1500ms opacity;
 }
