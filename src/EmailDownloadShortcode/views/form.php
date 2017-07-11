@@ -10,7 +10,7 @@ if ( ! ( $this instanceof Handler ) ) {
 
 ?>
 <div class="EmailDownload__wrapper clearfix">
-    <section class="">
+    <section>
 
         <div class="EmailDownload__inner">
 
@@ -33,9 +33,20 @@ if ( ! ( $this instanceof Handler ) ) {
                     </div>
                 </div>
 
+                <?php wp_nonce_field( DownloadController::NONCE_ACTION ); ?>
+
                 <input name="<?php echo Mailchimp::LIST_ID; ?>"
                        type="hidden"
-                       value="<?php echo Mailchimp::encrypt( $this->getAttribute( Handler::ATTRIBUTE_LIST_ID ) ); ?>">
+                       value="<?php echo DownloadController::encrypt(
+                           $this->getAttribute( Handler::ATTRIBUTE_LIST_ID )
+                       ); ?>">
+
+                <input name="<?php echo DownloadController::DOWNLOAD_KEY; ?>"
+                       type="hidden"
+                       value="<?php echo DownloadController::encrypt(
+                           $this->getAttribute( Handler::ATTRIBUTE_FILE ),
+                           DownloadController::getComputerId()
+                       ); ?>">
 
                 <button class="EmailDownload__button">
                     Download

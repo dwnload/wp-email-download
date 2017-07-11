@@ -25,6 +25,11 @@ class DownloadController extends RegisterPostRoute {
     const ROUTE_REQUIRED_FIELD = 'email';
     const SCRIPT_HANDLE = 'email-download';
     const OBJECT_NAME = 'emailDownload';
+    const DOWNLOAD_KEY = 'file_id';
+
+    const ENCRYPTION_DELIMITER = '|';
+    const ENCRYPTION_KEY = 'EMa1LD0WnL08D' . self::ENCRYPTION_DELIMITER;
+    const MAX_SUBMISSIONS = 5;
 
     /** @var  Settings $settings */
     protected $settings;
@@ -101,8 +106,16 @@ class DownloadController extends RegisterPostRoute {
      * @return WP_REST_Response|mixed
      */
     public function validateUserEmailSubscription( WP_REST_Request $request ) {
+        if ( ! check_ajax_referer( self::NONCE_ACTION, false, false ) ) {
+            return rest_ensure_response( new \WP_Error(
+                'nonce_error',
+                'A valid nonce key is required, please try again.',
+                [ 'status' => \WP_Http::UNAUTHORIZED ]
+            ) );
+        }
+
         $data = [
-            'access' => false,
+            'success' => false,
             'date' => date( 'Y-m-d H:i:s' ),
         ];
 
@@ -112,31 +125,154 @@ class DownloadController extends RegisterPostRoute {
         ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_params',
-                'One or more parameters are missing from this request.'
+                'One or more parameters are missing from this request.',
+                [ 'status' => \WP_Http::OK ]
             ) );
         }
 
+        // This is here for extra protection (not for users) Admins show have their keys set
         if ( empty( $api_key = $this->settings->getSettings()[ Mailchimp::SETTING_API_KEY ] ) ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_api_key',
-                'A MailChimp API Key is required to complete this request.'
+                'A MailChimp API Key is required to complete this request.',
+                [ 'status' => \WP_Http::OK ]
+            ) );
+        }
+
+        // Count submissions
+        if ( ! $this->canSubmitForm( time() ) ) {
+            return rest_ensure_response( new \WP_Error(
+                'submission_error',
+                'Form submission exceeded. Please try again in an hour.',
+                [ 'status' => \WP_Http::OK ]
             ) );
         }
 
         try {
             $chimp = new MailChimp( $api_key );
-            $list_id = $chimp->decrypt( $request->get_param( Mailchimp::LIST_ID ) );
+            $list_id = $this->decrypt( $request->get_param( Mailchimp::LIST_ID ) );
             $subscriber = $chimp->subscriberHash( $request->get_param( self::ROUTE_REQUIRED_FIELD ) );
             $response = $chimp->get( "lists/$list_id/members/$subscriber" );
 
             // User is subscribed, send them the download!
             if ( $chimp->success() && isset( $response['id'] ) ) {
-                $data['access'] = true;
+                $file = $this->decryptFileAndDownload( $request );
+                if ( $file !== '' ) {
+                    $data['success'] = true;
+                    $data['file'] = $file;
+                }
+                delete_transient( $this->getTransientKey() );
             }
         } catch ( \Exception $e ) {
             $data['error'] = esc_html( $e->getMessage() );
         }
 
         return rest_ensure_response( $data );
+    }
+
+    /**
+     * Decrypt a string.
+     *
+     * @param string $data
+     * @param string $encryption_key
+     *
+     * @return string
+     */
+    public function decrypt( string $data, string $encryption_key = self::ENCRYPTION_KEY ) {
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $encryption_key );
+        $iv = substr( hash( 'sha256', sprintf( '%s_iv',$encryption_key ) ), 0, 16 );
+
+        return openssl_decrypt( base64_decode( $data ), $encrypt_method, $key, 0, $iv );
+    }
+
+    /**
+     * Encrypt a string.
+     *
+     * @param string $data
+     * @param string $encryption_key
+     *
+     * @return string
+     */
+    public static function encrypt( string $data, string $encryption_key = self::ENCRYPTION_KEY ) {
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $encryption_key );
+        $iv = substr( hash( 'sha256', sprintf( '%s_iv',$encryption_key ) ), 0, 16 );
+
+        return base64_encode( openssl_encrypt( $data, $encrypt_method, $key, 0, $iv ) );
+    }
+
+    /**
+     * @link https://stackoverflow.com/a/18187783/558561
+     * @return string
+     */
+    public static function getComputerId(): string {
+        static $computer_id;
+
+        if ( ! $computer_id ) {
+            $computer_id = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+            $computer_id .= isset( $_SERVER['LOCAL_ADDR'] ) ? $_SERVER['LOCAL_ADDR'] : '';
+            $computer_id .= isset( $_SERVER['LOCAL_PORT'] ) ? $_SERVER['LOCAL_PORT'] : '';
+            $computer_id .= isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+        }
+
+        return $computer_id;
+    }
+
+    /**
+     * Get the attachment URI.
+     *
+     * @param WP_REST_Request $request
+     *
+     * @return string Returns URI to uploaded attachment or empty string on failure.
+     */
+    protected function decryptFileAndDownload( WP_REST_Request $request ): string {
+        $file_id = $this->decrypt( $request->get_param( self::DOWNLOAD_KEY ), self::getComputerId() );
+        $uri = wp_get_attachment_url( absint( $file_id ) );
+
+        return is_string( $uri ) ? $uri : '';
+    }
+
+    /**
+     * Can the user submit the form request?
+     *
+     * @param int $time
+     *
+     * @return bool
+     */
+    private function canSubmitForm( int $time ): bool {
+        $transient = $this->getTransientKey();
+        $session = get_transient( $transient );
+        if ( $session === false ) {
+            $session = [
+                'last_submitted' => 0,
+                'submission_count' => 0,
+            ];
+        }
+
+        if ( $session['submission_count'] > self::MAX_SUBMISSIONS ||
+            (
+                $time - $session['last_submitted'] < HOUR_IN_SECONDS &&
+                $session['submission_count'] > self::MAX_SUBMISSIONS
+            )
+        ) {
+            return false;
+        }
+
+        $session['last_submitted'] = $time;
+        $session['submission_count'] = $session['submission_count'] + 1;
+
+        set_transient( $transient, $session, DAY_IN_SECONDS );
+
+        return true;
+    }
+
+    /**
+     * Get the transient key.
+     *
+     * @return string
+     */
+    private function getTransientKey(): string {
+        return sprintf( 'email_download_%s', md5( self::getComputerId() ) );
     }
 }

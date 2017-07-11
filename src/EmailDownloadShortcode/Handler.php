@@ -59,6 +59,13 @@ class Handler implements ShortcodeHandler {
     }
 
     /**
+     * Register our shortcode output stylesheet.
+     */
+    public function registerScripts() {
+        wp_register_style( self::SCRIPT_HANDLE, plugins_url( 'assets/css/style.css', EmailDownload::getFile() ) );
+    }
+
+    /**
      * @param string $tag
      */
     public function setTag( string $tag ) {
@@ -78,6 +85,10 @@ class Handler implements ShortcodeHandler {
     }
 
     /**
+     * Get an attribute from the attributes array.
+     *
+     * @param string $attr
+     *
      * @return string
      */
     public function getAttribute( string $attr ): string {
@@ -144,10 +155,6 @@ class Handler implements ShortcodeHandler {
         ];
 
         $this->shortcodeUiRegisterShortcode( $this->tag, $shortcode_ui_args );
-    }
-
-    public function registerScripts() {
-        wp_register_style( self::SCRIPT_HANDLE, plugins_url( 'assets/css/style.css', EmailDownload::getFile() ) );
     }
 
     /**

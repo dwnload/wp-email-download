@@ -13,9 +13,6 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
     const SETTING_API_KEY = 'api_key';
     const SETTING_LIST_ID = self::LIST_ID;
 
-    const ENCRYPTION_DELIMITER = '||';
-    const ENCRYPTION_KEY = 'M@ILCH1MP' . self::ENCRYPTION_DELIMITER;
-
     /**
      * Create a new instance
      *
@@ -62,26 +59,6 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
         }
 
         return $array;
-    }
-
-    /**
-     * @param string $data
-     *
-     * @return string
-     */
-    public function decrypt( string $data ): string {
-        $data = base64_decode( sprintf( '%s%s', self::ENCRYPTION_KEY, $data ) );
-
-        return explode( self::ENCRYPTION_DELIMITER, $data )[1] ?? '';
-    }
-
-    /**
-     * @param string $data
-     *
-     * @return string
-     */
-    public static function encrypt( string $data ) {
-        return base64_encode( sprintf( '%s%s', self::ENCRYPTION_KEY, $data ) );
     }
 
     /**
