@@ -38,6 +38,9 @@ class DownloadController extends RegisterPostRoute {
         $this->settings = $settings;
     }
 
+    /**
+     * Add class hooks.
+     */
     public function addHooks() {
         parent::addHooks();
         add_action( 'wp_enqueue_scripts', [ $this, 'registerScripts' ] );
@@ -116,18 +119,13 @@ class DownloadController extends RegisterPostRoute {
         if ( empty( $api_key = $this->settings->getSettings()[ Mailchimp::SETTING_API_KEY ] ) ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_api_key',
-                'A MailChimp API Key is required to complete this request. ' . $api_key
+                'A MailChimp API Key is required to complete this request.'
             ) );
         }
 
         try {
             $chimp = new MailChimp( $api_key );
             $list_id = $chimp->decrypt( $request->get_param( Mailchimp::LIST_ID ) );
-            error_log( wp_json_encode( [
-                'before' => $request->get_param( Mailchimp::LIST_ID ),
-                'after' => $list_id,
-                'header' => $request->get_header( 'X-WP-Nonce' ),
-            ] ) );
             $subscriber = $chimp->subscriberHash( $request->get_param( self::ROUTE_REQUIRED_FIELD ) );
             $response = $chimp->get( "lists/$list_id/members/$subscriber" );
 
