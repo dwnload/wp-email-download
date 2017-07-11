@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Email Download
  * Plugin URI: https://github.com/dwnload/wp-email-download
- * Description: ...
+ * Description: Require a user to be a subscriber to your (MailChimp) mailing list before downloading an attachment.
  * Version: 0.1
  * Author:  Austin Passy
  * Author URI: https://austin.passy.co
