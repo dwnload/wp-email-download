@@ -46,6 +46,7 @@ class EmailDownload {
      */
     public function hookup() {
         $settings = new Settings();
+        $settings->setPrefix( 'email_download' );
         if ( is_admin() ) {
             $this->getInit()
                 ->add( $settings )
