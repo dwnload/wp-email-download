@@ -1,6 +1,7 @@
 <?php
-
-use Dwnload\WpEmailDownload\Api\DownloadController;
+/** @var Api $api */
+use Dwnload\WpEmailDownload\Api\Api;
+use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 
@@ -13,6 +14,8 @@ if ( ! ( $this instanceof Handler ) ) {
     <section>
 
         <div class="EmailDownload__inner">
+
+            <div class="EmailDownload__notice" style="display: none"><p></p></div>
 
             <form class="EmailDownload__form"
                   action="" method="post">
@@ -33,19 +36,19 @@ if ( ! ( $this instanceof Handler ) ) {
                     </div>
                 </div>
 
-                <?php wp_nonce_field( DownloadController::NONCE_ACTION ); ?>
+                <?php wp_nonce_field( SubscriptionController::NONCE_ACTION ); ?>
 
                 <input name="<?php echo Mailchimp::LIST_ID; ?>"
                        type="hidden"
-                       value="<?php echo DownloadController::encrypt(
+                       value="<?php echo $api->encrypt(
                            $this->getAttribute( Handler::ATTRIBUTE_LIST_ID )
                        ); ?>">
 
-                <input name="<?php echo DownloadController::DOWNLOAD_KEY; ?>"
+                <input name="<?php echo SubscriptionController::DOWNLOAD_KEY; ?>"
                        type="hidden"
-                       value="<?php echo DownloadController::encrypt(
+                       value="<?php echo $api->encrypt(
                            $this->getAttribute( Handler::ATTRIBUTE_FILE ),
-                           DownloadController::getComputerId()
+                           $api->getComputerId()
                        ); ?>">
 
                 <button class="EmailDownload__button">

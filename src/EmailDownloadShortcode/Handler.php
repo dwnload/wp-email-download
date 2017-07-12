@@ -3,6 +3,7 @@
 namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
 use Dwnload\WpEmailDownload\Admin\Settings;
+use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
@@ -26,6 +27,9 @@ class Handler implements ShortcodeHandler {
     /** @var array $atts */
     protected $atts = [];
 
+    /** @var Api $api */
+    protected $api;
+
     /** @var Settings $settings */
     protected $settings;
 
@@ -35,9 +39,11 @@ class Handler implements ShortcodeHandler {
     /**
      * Handler constructor.
      *
+     * @param Api $api
      * @param Settings $settings
      */
-    public function __construct( Settings $settings ) {
+    public function __construct( Api $api, Settings $settings ) {
+        $this->api = $api;
         $this->settings = $settings;
     }
 
@@ -125,6 +131,7 @@ class Handler implements ShortcodeHandler {
         }
 
         ob_start();
+        $api = $this->api;
         include __DIR__ . '/views/form.php';
         $content = ob_get_clean();
 

@@ -11,6 +11,8 @@ use Dwnload\WpEmailDownload\WpHooksInterface;
  */
 abstract class RouteService implements WpHooksInterface {
 
+    const NONCE_ACTION = 'wp_rest';
+
     /**
      * Adds hooks
      */
