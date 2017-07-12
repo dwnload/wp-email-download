@@ -2,6 +2,14 @@
     margin-bottom: 1.5rem;
 }
 
+/* Warnings/Alerts */
+.EmailDownload__notice > p {
+    padding: 6px 9px;
+    background: #fffbbc;
+    border: 1px solid #E6DB55;
+    border-left-width: thick;
+}
+
 .EmailDownload__group {
     margin-bottom: 20px;
     padding: 4px 0;
