@@ -3,7 +3,10 @@
 namespace Dwnload\WpEmailDownload;
 
 use Dwnload\WpEmailDownload\Admin\Settings;
+use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\DownloadController;
+use Dwnload\WpEmailDownload\Api\Scripts;
+use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
@@ -14,6 +17,8 @@ use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
  * @package Dwnload\WpEmailDownload
  */
 class EmailDownload {
+
+    const ROUTE_NAMESPACE = 'dwnload/v1';
 
     /**
      * @var Init $init
@@ -53,9 +58,12 @@ class EmailDownload {
                 ->initialize();
         }
 
+        $api = new Api();
         $this->getInit()
-            ->add( new DownloadController( $settings ) )
-            ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $settings ) ) ) )
+            ->add( new Scripts( $settings ) )
+            ->add( new SubscriptionController( $api, $settings ) )
+            ->add( new DownloadController( $api, $settings ) )
+            ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api, $settings ) ) ) )
             ->initialize();
     }
 
