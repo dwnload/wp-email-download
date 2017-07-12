@@ -18,10 +18,10 @@ if ( ! ( $this instanceof Settings ) ) {
                 <th scope="row" valign="top">MailChimp API Key</th>
                 <td>
                     <label>
-                        <input type="password"
+                        <input type="text"
                                class="widefat"
                                name="<?php echo $this->getFieldName( Mailchimp::SETTING_API_KEY ); ?>"
-                               value="<?php echo $this->getSetting( Mailchimp::SETTING_API_KEY ); ?>">
+                               value="<?php echo $this->getObfuscatedSetting( Mailchimp::SETTING_API_KEY ); ?>">
                     </label>
                     <span class="description">Enter your MailChimp API Key here.</span>
                 </td>

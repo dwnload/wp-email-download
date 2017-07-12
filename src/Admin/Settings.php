@@ -55,4 +55,22 @@ class Settings extends AbstractSettings implements WpHooksInterface {
 
         return $this;
     }
+
+    /**
+     * @param string $setting
+     * @param string $type
+     * @param bool $default
+     *
+     * @return mixed|string
+     */
+    public function getObfuscatedSetting( string $setting = '', $type = 'string', $default = false ) {
+        $value = parent::getSetting( $setting, $type, $default );
+
+        if ( ! empty( $value ) ) {
+            $len = 8;
+            return str_repeat( '*', strlen( $value ) - $len ) . substr( $value, -$len, $len );
+        }
+
+        return $value;
+    }
 }
