@@ -50,8 +50,7 @@ class EmailDownload {
      * Initiate all class hookups.
      */
     public function hookup() {
-        $settings = new Settings();
-        $settings->setPrefix( 'email_download' );
+        $settings = ( new Settings() )->setPrefix( 'email_download' );
         if ( is_admin() ) {
             $this->getInit()
                 ->add( $settings )
