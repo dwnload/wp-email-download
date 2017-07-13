@@ -17,6 +17,7 @@ class DownloadController extends RegisterGetRoute {
 
     const ENCRYPTION_KEY = 'D0WnL0ADk3Y';
     const MIME_TYPE = 'application/octet-stream';
+    const NONCE_NAME = 'time';
     const ROUTE_FILE_PREFIX = '/download/';
     const ROUTE_REQUIRED_FIELD = 'data';
 
@@ -78,7 +79,7 @@ class DownloadController extends RegisterGetRoute {
 
         $data = $request->get_param( self::ROUTE_REQUIRED_FIELD );
         $value = $this->api->decrypt( $data, self::ENCRYPTION_KEY );
-        list( , , $file_url ) = explode( Api::ENCRYPTION_DELIMITER, $value );
+        list( $email, , $file_url ) = explode( Api::ENCRYPTION_DELIMITER, $value );
 
         // Required parameters (though the 'data' field is required by the route
         if ( empty( $file_url ) ) {
@@ -125,11 +126,11 @@ class DownloadController extends RegisterGetRoute {
         $headers['Content-Disposition'] = "attachment; filename=\"{$file_name}\";";
         $headers['Content-Transfer-Encoding'] = 'binary';
         $headers['Connection'] = 'close';
-        if ( $file_size !== - 1 ) {
+        if ( $file_size !== -1 ) {
             $headers['Content-Length'] = $file_size;
             $headers['Accept-Ranges'] = 'bytes';
         }
-        $headers = apply_filters( 'bbd_download_headers', $headers, $file_path );
+        $headers = apply_filters( 'email_download_force_download_headers', $headers, $file_path );
 
         return $headers;
     }
@@ -160,7 +161,7 @@ class DownloadController extends RegisterGetRoute {
             }
         }
 
-        return ( - 1 );
+        return ( -1 );
     }
 
     /**
@@ -177,8 +178,8 @@ class DownloadController extends RegisterGetRoute {
         $wp_uploads_dir = $wp_uploads['basedir'];
         $wp_uploads_url = $wp_uploads['baseurl'];
         if ( ( ! isset( $parsed_file_path['scheme'] ) ||
-               ! in_array( $parsed_file_path['scheme'], [ 'http', 'https', 'ftp', ] ) ) &&
-             isset( $parsed_file_path['path'] ) && file_exists( $parsed_file_path['path'] )
+                ! in_array( $parsed_file_path['scheme'], [ 'http', 'https', 'ftp', ] ) ) &&
+            isset( $parsed_file_path['path'] ) && file_exists( $parsed_file_path['path'] )
         ) {
             /** This is an absolute path */
             $remote_file = false;
@@ -201,7 +202,7 @@ class DownloadController extends RegisterGetRoute {
             $file_path = str_replace( $wp_uploads_url, $wp_uploads_dir, $file_path );
             $file_path = realpath( $file_path );
         } elseif ( strpos( $file_path, site_url( '/', 'http' ) ) !== false ||
-                   strpos( $file_path, site_url( '/', 'https' ) ) !== false
+            strpos( $file_path, site_url( '/', 'https' ) ) !== false
         ) {
             /** This is a local file outside of wp-content so figure out the path */
             $remote_file = false;

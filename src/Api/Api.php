@@ -80,28 +80,26 @@ final class Api {
     }
 
     /**
-     * Build the REST URL to download the attachement.
+     * Build the REST URL to download the attachment.
      *
-     * @param string $email_address
-     * @param string $subscriber_hash
-     * @param string $file_url
+     * @param string $email The current users email address
+     * @param string $sub_hash The current users subscription hash from MailChimp
+     * @param string $file_url The attachment URL
      *
      * @return string
      */
-    public function buildDownloadRestUrl(
-        string $email_address,
-        string $subscriber_hash,
-        string $file_url
-    ): string {
-        $data = sprintf(
-            '%1$s%4$s%2$s%4$s%3$s',
-            $email_address,
-            $subscriber_hash,
-            $file_url,
-            self::ENCRYPTION_DELIMITER
+    public function buildDownloadRestUrl( string $email, string $sub_hash, string $file_url ): string {
+        $data = $this->encrypt(
+            sprintf(
+                '%1$s%4$s%2$s%4$s%3$s',
+                $email,
+                $sub_hash,
+                $file_url,
+                self::ENCRYPTION_DELIMITER
+            ),
+            DownloadController::ENCRYPTION_KEY
         );
-        $nonce = $this->encrypt( $data, DownloadController::ENCRYPTION_KEY );
-        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_FILE_PREFIX . $nonce;
+        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_FILE_PREFIX . $data;
 
         return get_rest_url( null, $path );
     }
