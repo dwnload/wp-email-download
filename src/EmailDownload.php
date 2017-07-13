@@ -72,7 +72,4 @@ class EmailDownload {
     public static function getFile(): string {
         return self::$file;
     }
-
-    public static function activationHook() {
-    }
 }
