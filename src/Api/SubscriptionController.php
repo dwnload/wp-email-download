@@ -85,7 +85,7 @@ class SubscriptionController extends RegisterPostRoute {
 
         // Required parameters (though the 'email' field is required by the route
         if ( empty( $request->get_param( self::ROUTE_REQUIRED_FIELD ) ) ||
-            empty( $request->get_param( Mailchimp::LIST_ID ) )
+             empty( $request->get_param( Mailchimp::LIST_ID ) )
         ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_params',
@@ -115,16 +115,20 @@ class SubscriptionController extends RegisterPostRoute {
         try {
             $chimp = new MailChimp( $api_key );
             $list_id = $this->api->decrypt( $request->get_param( Mailchimp::LIST_ID ) );
-            $email_address = $request->get_param( self::ROUTE_REQUIRED_FIELD );
+            $email_address = sanitize_email( $request->get_param( self::ROUTE_REQUIRED_FIELD ) );
             $subscriber = $chimp->subscriberHash( $email_address );
             $response = $chimp->get( "lists/$list_id/members/$subscriber" );
 
             // User is subscribed, send them the download!
             if ( $chimp->success() && isset( $response['id'] ) ) {
-                $file = $this->api->getDecryptFileIdAttachmentUrl( $request );
-                if ( $file !== '' ) {
+                $file_url = $this->api->getDecryptFileIdAttachmentUrl( $request );
+                if ( $file_url !== '' ) {
                     $data['success'] = true;
-                    $data['url'] = $this->api->buildDownloadRestUrl( $email_address );
+                    $data['url'] = $this->api->buildDownloadRestUrl(
+                        $email_address,
+                        $subscriber,
+                        $file_url
+                    );
                 }
                 delete_transient( $this->api->getTransientKey() );
             }
@@ -143,28 +147,28 @@ class SubscriptionController extends RegisterPostRoute {
      * @return bool
      */
     private function canSubmitForm( int $time ): bool {
-        $transient = $this->api->getTransientKey();
-        $session = get_transient( $transient );
-        if ( $session === false ) {
-            $session = [
+        $key = $this->api->getTransientKey();
+        $transient = get_transient( $key );
+        if ( $transient === false ) {
+            $transient = [
                 'last_submitted' => 0,
                 'submission_count' => 0,
             ];
         }
 
-        if ( $session['submission_count'] > Api::MAX_SUBMISSIONS ||
-            (
-                $time - $session['last_submitted'] < HOUR_IN_SECONDS &&
-                $session['submission_count'] > Api::MAX_SUBMISSIONS
-            )
+        if ( $transient['submission_count'] > Api::MAX_SUBMISSIONS ||
+             (
+                 $time - $transient['last_submitted'] < HOUR_IN_SECONDS &&
+                 $transient['submission_count'] > Api::MAX_SUBMISSIONS
+             )
         ) {
             return false;
         }
 
-        $session['last_submitted'] = $time;
-        $session['submission_count'] = $session['submission_count'] + 1;
+        $transient['last_submitted'] = $time;
+        $transient['submission_count'] = $transient['submission_count'] + 1;
 
-        set_transient( $transient, $session, DAY_IN_SECONDS );
+        set_transient( $key, $transient, DAY_IN_SECONDS );
 
         return true;
     }
