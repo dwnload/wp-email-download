@@ -157,7 +157,7 @@ class Handler implements ShortcodeHandler {
         $shortcode_ui_args = [
             'label' => esc_html__( 'Email Download shortcode', 'email-download' ),
             'listItemImage' => 'dashicons-download',
-            'post_type' => [ 'page' ],
+            'post_type' => [ 'post', 'page' ],
             'attrs' => $fields,
         ];
 
