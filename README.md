@@ -1,6 +1,6 @@
 # Email Download #
 
-### Collect emails (or require subscription) before allowing access to downloads
+### Allow users to download any WordPress managed file if they're subscribed to you MailChimp list
 
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  

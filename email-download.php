@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Email Download
  * Plugin URI: https://github.com/dwnload/wp-email-download
- * Description: Require a user to be a subscriber to your (MailChimp) mailing list before downloading an attachment.
- * Version: 0.2
+ * Description:Allow users to download any WordPress managed file if they're subscribed to you MailChimp list.
+ * Version: 0.2.1
  * Author:  Austin Passy
  * Author URI: https://austin.passy.co
  * Text Domain: email-download
@@ -12,14 +12,13 @@
  * Copyright (c) 2017 Passy.co, LLC (https://passy.co/)
  */
 
+use Dwnload\WpEmailDownload\EmailDownload;
+use Dwnload\WpEmailDownload\Init;
+
 if ( version_compare( phpversion(), '7.0.1', '>=' ) ) {
     require __DIR__ . '/vendor/autoload.php';
 
-    ( new \Dwnload\WpEmailDownload\EmailDownload(
-        new \Dwnload\WpEmailDownload\Init(),
-        __FILE__
-    ) )->hookup();
-    register_activation_hook( __FILE__, '\Dwnload\WpEmailDownload\EmailDownload::activationHook' );
+    ( new EmailDownload( new Init(), __FILE__ ) )->hookup();
 } else {
     require __DIR__ . '/src/includes/functions.php';
     if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {
