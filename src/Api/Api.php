@@ -14,6 +14,7 @@ final class Api {
     const ENCRYPTION_DELIMITER = '|';
     const ENCRYPTION_KEY = 'EMa1LD0WnL08D' . self::ENCRYPTION_DELIMITER;
     const MAX_SUBMISSIONS = 5;
+    const SESSION_KEY = 'email_download';
 
     /**
      * Decrypt a string.
@@ -79,16 +80,28 @@ final class Api {
     }
 
     /**
+     * Build the REST URL to download the attachement.
+     *
      * @param string $email_address
+     * @param string $subscriber_hash
+     * @param string $file_url
      *
      * @return string
      */
-    public function buildDownloadRestUrl( string $email_address ): string {
-        $nonce = $this->encrypt( $email_address, DownloadController::ENCRYPTION_KEY );
-        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_FILE_PREFIX . $nonce . '/' . $email_address;
-
-        // @todo: Set a expirey cookie OR SESSION here with the email address to check against in the REST GET request.
-        error_log( get_rest_url( null, $path ) );
+    public function buildDownloadRestUrl(
+        string $email_address,
+        string $subscriber_hash,
+        string $file_url
+    ): string {
+        $data = sprintf(
+            '%1$s%4$s%2$s%4$s%3$s',
+            $email_address,
+            $subscriber_hash,
+            $file_url,
+            self::ENCRYPTION_DELIMITER
+        );
+        $nonce = $this->encrypt( $data, DownloadController::ENCRYPTION_KEY );
+        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_FILE_PREFIX . $nonce;
 
         return get_rest_url( null, $path );
     }
@@ -101,7 +114,8 @@ final class Api {
      * @return int
      */
     public function getFileIdFromRequest( WP_REST_Request $request ): int {
-        $file_id = $this->decrypt( $request->get_param( SubscriptionController::DOWNLOAD_KEY ), self::getComputerId() );
+        $data = $request->get_param( SubscriptionController::DOWNLOAD_KEY );
+        $file_id = $this->decrypt( $data, self::getComputerId() );
 
         return absint( $file_id );
     }
