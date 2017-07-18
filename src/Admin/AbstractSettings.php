@@ -64,6 +64,13 @@ abstract class AbstractSettings implements WpHooksInterface {
         if ( empty( $this->settings ) ) {
             $this->settings = $this->getSettings();
         }
+        /**
+         * @filter wp_email_download_update_setting
+         * @param mixed $value
+         * @param string $setting
+         * @param array $this->settings
+         */
+        $value = apply_filters( 'wp_email_download_update_setting', $value, $setting, $this->settings );
         $this->settings[ $setting ] = $value;
 
         return $this->updateSettings( $this->settings );
