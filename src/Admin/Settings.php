@@ -2,6 +2,7 @@
 
 namespace Dwnload\WpEmailDownload\Admin;
 
+use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\WpHooksInterface;
 
 /**
@@ -19,6 +20,7 @@ class Settings extends AbstractSettings implements WpHooksInterface {
     public function addHooks() {
         parent::addHooks();
         add_action( 'admin_menu', [ $this, 'addMenuPage' ] );
+        add_filter( 'pipeline_linkedin_update_setting', [ $this, 'sanitizeSetting' ], 10, 3 );
     }
 
     /**
@@ -32,6 +34,33 @@ class Settings extends AbstractSettings implements WpHooksInterface {
             self::SETTINGS_PAGE_SLUG,
             [ $this, 'menuPageCallback', ]
         );
+    }
+
+    /**
+     * Sanitize our settings, and be sure that any obfuscated settings don't get
+     * saved that way.
+     *
+     * @param mixed $value The incoming setting key value.
+     * @param string $setting The incoming setting key.
+     * @param array $settings The full setting $_REQUEST array.
+     *
+     * @return mixed
+     */
+    public function sanitizeSetting( $value, string $setting, array $settings ) {
+        switch ( $setting ) {
+            case Mailchimp::SETTING_API_KEY:
+                if ( $this->isObfuscated( $value ) ) {
+                    $new_value = $settings[ Mailchimp::SETTING_API_KEY ];
+                } else {
+                    $new_value = sanitize_text_field( $value );
+                }
+                break;
+            default:
+                $new_value = sanitize_text_field( $value );
+                break;
+        }
+
+        return $new_value;
     }
 
     /**
@@ -68,9 +97,19 @@ class Settings extends AbstractSettings implements WpHooksInterface {
 
         if ( ! empty( $value ) ) {
             $len = 8;
-            return str_repeat( '*', strlen( $value ) - $len ) . substr( $value, -$len, $len );
+
+            return str_repeat( '*', strlen( $value ) - $len ) . substr( $value, - $len, $len );
         }
 
         return $value;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function isObfuscated( string $value ): bool {
+        return strpos( $value, '*' ) !== false;
     }
 }
