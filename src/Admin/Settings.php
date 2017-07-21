@@ -20,7 +20,7 @@ class Settings extends AbstractSettings implements WpHooksInterface {
     public function addHooks() {
         parent::addHooks();
         add_action( 'admin_menu', [ $this, 'addMenuPage' ] );
-        add_filter( 'pipeline_linkedin_update_setting', [ $this, 'sanitizeSetting' ], 10, 3 );
+        add_filter( 'wp_email_download_update_setting', [ $this, 'sanitizeSetting' ], 10, 3 );
     }
 
     /**
