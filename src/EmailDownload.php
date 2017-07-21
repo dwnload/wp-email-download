@@ -59,7 +59,7 @@ class EmailDownload {
 
         $api = new Api();
         $this->getInit()
-            ->add( new Scripts( $settings ) )
+            ->add( new Scripts() )
             ->add( new SubscriptionController( $api, $settings ) )
             ->add( new DownloadController( $api, $settings ) )
             ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api, $settings ) ) ) )
