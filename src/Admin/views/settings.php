@@ -19,10 +19,11 @@ if ( ! ( $this instanceof Settings ) ) {
                 <td>
                     <label>
                         <input type="text"
-                               class="widefat"
+                               class="regular-text"
                                name="<?php echo $this->getFieldName( Mailchimp::SETTING_API_KEY ); ?>"
                                value="<?php echo $this->getObfuscatedSetting( Mailchimp::SETTING_API_KEY ); ?>">
                     </label>
+                    <br>
                     <span class="description">Enter your MailChimp API Key here. A valid API Key
                         should have a data center at the end like: <code>-us6</code> for example.</span>
                 </td>
