@@ -3,6 +3,7 @@
   "description": "Allow users to download any WordPress managed file if they're subscribed to you MailChimp list",
   "type": "wordpress-plugin",
   "version": "0.2.3",
+  "license": "GPL2",
   "keywords": ["wordpress-plugin", "downloader", "email-subscription", "mailchimp", "wp-api"],
   "authors": [
     {
