@@ -158,5 +158,44 @@
             "validation",
             "validator"
         ]
+    },
+    {
+        "name": "thefrosty/wp-utilities",
+        "version": "0.2.2",
+        "version_normalized": "0.2.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thefrosty/wp-utilities.git",
+            "reference": "efbaf68da7aa18c533d0151e1953f2f619c70a6c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thefrosty/wp-utilities/zipball/efbaf68da7aa18c533d0151e1953f2f619c70a6c",
+            "reference": "efbaf68da7aa18c533d0151e1953f2f619c70a6c",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=7.0"
+        },
+        "time": "2017-07-28T21:05:31+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "TheFrosty\\WP\\Utils\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Austin Passy",
+                "email": "austin@passy.co",
+                "homepage": "https://github.com/thefrosty"
+            }
+        ],
+        "description": "A library containing my standard development resources"
     }
 ]

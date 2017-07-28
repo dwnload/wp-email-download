@@ -11,6 +11,10 @@ class ComposerStaticInit5dce060b2f834c4e24669f170dea1b4a
     );
 
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'TheFrosty\\WP\\Utils\\' => 19,
+        ),
         'E' => 
         array (
             'Egulias\\EmailValidator\\' => 23,
@@ -23,6 +27,10 @@ class ComposerStaticInit5dce060b2f834c4e24669f170dea1b4a
     );
 
     public static $prefixDirsPsr4 = array (
+        'TheFrosty\\WP\\Utils\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/thefrosty/wp-utilities/src',
+        ),
         'Egulias\\EmailValidator\\' => 
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/EmailValidator',
