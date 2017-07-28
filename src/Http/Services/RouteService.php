@@ -2,7 +2,7 @@
 
 namespace Dwnload\WpEmailDownload\Http\Services;
 
-use Dwnload\WpEmailDownload\WpHooksInterface;
+use TheFrosty\WP\Utils\WpHooksInterface;
 
 /**
  * Class RouteService

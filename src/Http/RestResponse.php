@@ -2,7 +2,7 @@
 
 namespace Dwnload\WpEmailDownload\Http;
 
-use Dwnload\WpEmailDownload\WpHooksInterface;
+use TheFrosty\WP\Utils\WpHooksInterface;
 
 /**
  * Class RestResponse

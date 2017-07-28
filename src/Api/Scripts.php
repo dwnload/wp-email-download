@@ -4,7 +4,7 @@ namespace Dwnload\WpEmailDownload\Api;
 
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\Http\Services\RouteService;
-use Dwnload\WpEmailDownload\WpHooksInterface;
+use TheFrosty\WP\Utils\WpHooksInterface;
 
 /**
  * Class Scripts
