@@ -10,6 +10,7 @@ use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
+use TheFrosty\WP\Utils\Init;
 
 /**
  * Class EmailDownload
@@ -30,13 +31,13 @@ class EmailDownload {
 
     /**
      * @param Init $init
-     * @param string $file
+     *
+     * @return EmailDownload
      */
-    public function __construct( Init $init, string $file ) {
+    public function setInit( Init $init ): EmailDownload {
         $this->init = $init;
-        if ( ! isset( self::$file ) ) {
-            self::$file = $file;
-        }
+
+        return $this;
     }
 
     /**
@@ -64,6 +65,13 @@ class EmailDownload {
             ->add( new DownloadController( $api, $settings ) )
             ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api, $settings ) ) ) )
             ->initialize();
+    }
+
+    /**
+     * @param string $file
+     */
+    public static function setFile( string $file ) {
+        self::$file = $file;
     }
 
     /**
