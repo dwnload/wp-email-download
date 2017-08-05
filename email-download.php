@@ -3,7 +3,7 @@
  * Plugin Name: Email Download
  * Plugin URI: https://github.com/dwnload/wp-email-download
  * Description:Allow users to download any WordPress managed file if they're subscribed to you MailChimp list.
- * Version: 0.2.3
+ * Version: 0.2.4
  * Author:  Austin Passy
  * Author URI: https://austin.passy.co
  * Text Domain: email-download
@@ -16,10 +16,18 @@ use Dwnload\WpEmailDownload\EmailDownload;
 use TheFrosty\WP\Utils\Init;
 
 if ( version_compare( phpversion(), '7.0.1', '>=' ) ) {
-    require __DIR__ . '/vendor/autoload.php';
+    if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+        require __DIR__ . '/vendor/autoload.php';
 
-    EmailDownload::setFile( __FILE__ );
-    ( new EmailDownload() )->setInit( new Init() )->hookup();
+        EmailDownload::setFile( __FILE__ );
+        ( new EmailDownload() )->setInit( new Init() )->hookup();
+    } else {
+        if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {
+            WP_CLI::warning( \Dwnload\WpEmailDownload\autoload_file_text() );
+        } else {
+            add_action( 'admin_notices', '\Dwnload\WpEmailDownload\autoload_error' );
+        }
+    }
 } else {
     require __DIR__ . '/src/includes/functions.php';
     if ( class_exists( 'WP_CLI' ) && defined( 'WP_CLI' ) ) {

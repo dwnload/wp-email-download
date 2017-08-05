@@ -23,8 +23,28 @@ function admin_notice( string $message, string $class = 'error' ) {
 /**
  * Admin notice for incompatible versions of PHP.
  */
+function autoload_error() {
+    admin_notice( autoload_file_text(), 'error' );
+}
+
+/**
+ * Admin notice for incompatible versions of PHP.
+ */
 function version_error() {
     admin_notice( php_version_text(), 'error' );
+}
+
+/**
+ * String describing the minimum PHP version.
+ *
+ * @return string
+ */
+function autoload_file_text() {
+    return sprintf(
+        esc_html__( '%s plugin error: The %s file is missing. Please install this plugin from a GitHub release or download from the website.', 'email-download' ),
+        PLUGIN_NAME,
+        'vendor/autoload.php'
+    );
 }
 
 /**
@@ -46,7 +66,6 @@ function php_version_text() {
  */
 function missing_shorcode_ui_text() {
     if ( current_user_can( 'install_plugins' ) ) {
-        $plugin_slug = 'shortcode-ui';
         $install_url = wp_nonce_url(
             self_admin_url( 'update.php?action=install-plugin&plugin=' . SHORTCODE_UI_SLUG ),
             'install-plugin_' . SHORTCODE_UI_SLUG
