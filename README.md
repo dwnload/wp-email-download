@@ -1,6 +1,6 @@
 # Email Download #
 
-### Allow users to download any WordPress managed file if they're subscribed to you MailChimp list
+### Allow users to download any WordPress managed file if they're subscribed to your MailChimp list
 
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  
@@ -27,3 +27,13 @@ shortcode builder).
 ```html
 [email_to_download list-id="uo063u0837" file="4" /]
 ```
+
+### Installation
+
+To install this plugin, using Composer:
+
+```
+composer require dwnload/wp-email-download:~0.2
+```
+
+Otherwise, you'll have to download the plugin (built package)  via the [Plugin Garden]() (coming soon).
