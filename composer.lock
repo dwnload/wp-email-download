@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "21f83fb0e6ee9e1d61d69524f1cbcbee",
+    "content-hash": "19e0229a057d87503907d5069dfc4d9f",
     "packages": [
         {
             "name": "doctrine/lexer",
