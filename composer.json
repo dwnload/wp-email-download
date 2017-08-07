@@ -27,5 +27,6 @@
       "src/includes/functions.php"
     ]
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "preferred-install": "dist"
 }

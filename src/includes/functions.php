@@ -23,28 +23,8 @@ function admin_notice( string $message, string $class = 'error' ) {
 /**
  * Admin notice for incompatible versions of PHP.
  */
-function autoload_error() {
-    admin_notice( autoload_file_text(), 'error' );
-}
-
-/**
- * Admin notice for incompatible versions of PHP.
- */
 function version_error() {
     admin_notice( php_version_text(), 'error' );
-}
-
-/**
- * String describing the minimum PHP version.
- *
- * @return string
- */
-function autoload_file_text() {
-    return sprintf(
-        esc_html__( '%s plugin error: The %s file is missing. Please install this plugin from a GitHub release or download from the website.', 'email-download' ),
-        PLUGIN_NAME,
-        'vendor/autoload.php'
-    );
 }
 
 /**
