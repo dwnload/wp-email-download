@@ -17,7 +17,9 @@
     "php": ">=7.0.4",
     "drewm/mailchimp-api": "2.4",
     "egulias/email-validator": "~2.1",
-    "thefrosty/wp-utilities": "0.2.2"
+    "thefrosty/wp-utilities": "0.2.2",
+    "dwnload/edd-software-license-manager": "dev-master",
+    "dwnload/wp-settings-api": "^2.1.2"
   },
   "autoload": {
     "psr-4": {
