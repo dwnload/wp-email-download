@@ -2,7 +2,6 @@
 
 namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
-use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\EmailDownload;
@@ -10,6 +9,7 @@ use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
+use Dwnload\WpSettingsApi\Api\Options;
 
 /**
  * Class EmailDownloadHandler
@@ -30,9 +30,6 @@ class Handler implements ShortcodeHandler {
     /** @var Api $api */
     protected $api;
 
-    /** @var Settings $settings */
-    protected $settings;
-
     /** @var string $tag */
     protected $tag;
 
@@ -40,11 +37,9 @@ class Handler implements ShortcodeHandler {
      * Handler constructor.
      *
      * @param Api $api
-     * @param Settings $settings
      */
-    public function __construct( Api $api, Settings $settings ) {
+    public function __construct( Api $api ) {
         $this->api = $api;
-        $this->settings = $settings;
     }
 
     /**
@@ -170,7 +165,7 @@ class Handler implements ShortcodeHandler {
     protected function getMailchimpLists(): array {
         $options = [ '0' => 'No Lists found.' ];
 
-        if ( ! empty( $api_key = $this->settings->getSetting( Mailchimp::SETTING_API_KEY ) ) ) {
+        if ( ! empty( $api_key = Options::getOption( Mailchimp::SETTING_API_KEY ) ) ) {
             try {
                 return ( new MailChimp( $api_key ) )->getListsArray();
             } catch ( \Exception $e ) {

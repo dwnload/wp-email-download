@@ -3,7 +3,6 @@
 namespace Dwnload\WpEmailDownload;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\PluginUpdater;
-use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Admin\SettingsApi;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\DownloadController;
@@ -12,8 +11,8 @@ use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
-use Dwnload\WPSettingsApi\App;
-use Dwnload\WPSettingsApi\WPSettingsApi;
+use Dwnload\WpSettingsApi\App;
+use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WP\Utils\Init;
 
 /**
@@ -57,33 +56,31 @@ class EmailDownload {
      * Initiate all class hookups.
      */
     public function hookup() {
-        $settings = ( new Settings() )->setPrefix( 'email_download' );
         if ( is_admin() ) {
             $this->getInit()
-                ->add( $settings )
                 ->add( new PluginUpdater( $this->getUpdaterArgs() ) )
                 ->initialize();
         }
 
         $app = new App( [
-            'domain' => 'vendor-domain',
+            'domain' => 'email-download',
             'file' => dirname( __DIR__ ) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
-            'menu-slug' => 'vendor-domain-settings',
-            'menu-title' => 'Vendor Settings', // Title found in menu
-            'page-title' => 'Vendor Settings Api', // Title output at top of settings page
-            'prefix' => 'vendor_',
-            'version' => '0.7.9',
+            'menu-slug' => 'dwnload-email-download',
+            'menu-title' => 'Email Download', // Title found in menu
+            'page-title' => 'Email Download Settings', // Title output at top of settings page
+            'prefix' => 'dwnload_email_download',
+            'version' => '0.4.0',
         ] );
 
         $api = new Api();
         $this->getInit()
             ->add( $app )
-            ->add( new WPSettingsApi( $app ) )
+            ->add( new WpSettingsApi( $app ) )
             ->add( new SettingsApi() )
             ->add( new Scripts() )
-            ->add( new SubscriptionController( $api, $settings ) )
-            ->add( new DownloadController( $api, $settings ) )
-            ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api, $settings ) ) ) )
+            ->add( new SubscriptionController( $api ) )
+            ->add( new DownloadController( $api ) )
+            ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api ) ) ) )
             ->initialize();
     }
 
