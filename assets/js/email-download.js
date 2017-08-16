@@ -22,7 +22,7 @@
             $this.parent().slideUp().remove();
             document.location = response.url;
           }
-          var text = typeof response.message !== 'undefined' ? response.message : '';
+          var text = typeof response.message !== 'undefined' ? response.message : emailDownload.failure;
           $notice.text(text).parent().show();
           $button.attr('disabled', false);
         },

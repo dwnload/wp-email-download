@@ -2,9 +2,9 @@
 
 namespace Dwnload\WpEmailDownload\Api;
 
-use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\Http\Services\RegisterPostRoute;
+use Dwnload\WpSettingsApi\Api\Options;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -22,18 +22,13 @@ class SubscriptionController extends RegisterPostRoute {
     /** @var Api $api */
     protected $api;
 
-    /** @var Settings $settings */
-    protected $settings;
-
     /**
      * SubscriptionController constructor.
      *
      * @param Api $api
-     * @param Settings $settings
      */
-    public function __construct( Api $api, Settings $settings ) {
+    public function __construct( Api $api ) {
         $this->api = $api;
-        $this->settings = $settings;
     }
 
     /**
@@ -95,13 +90,14 @@ class SubscriptionController extends RegisterPostRoute {
         }
 
         // This is here for extra protection (not for users) Admins show have their keys set
-        if ( empty( $api_key = $this->settings->getSettings()[ Mailchimp::SETTING_API_KEY ] ) ) {
+        if ( empty( $api_key = Options::getOption( Mailchimp::SETTING_API_KEY ) ) ) {
             return rest_ensure_response( new \WP_Error(
                 'missing_api_key',
                 'A MailChimp API Key is required to complete this request.',
                 [ 'status' => \WP_Http::OK ]
             ) );
         }
+        error_log( $api_key );
 
         // Count submissions
         if ( ! $this->canSubmitForm( time() ) ) {
@@ -131,6 +127,9 @@ class SubscriptionController extends RegisterPostRoute {
                     );
                 }
                 delete_transient( $this->api->getTransientKey() );
+            } else {
+                // @todo Make this an option from the settings page.
+                $data['message'] = 'It seems you\'re not subscribed.';
             }
         } catch ( \Exception $e ) {
             $data['error'] = esc_html( $e->getMessage() );

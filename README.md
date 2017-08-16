@@ -33,7 +33,7 @@ shortcode builder).
 To install this plugin, using Composer:
 
 ```
-composer require dwnload/wp-email-download:~0.2
+composer require dwnload/wp-email-download:~0.4
 ```
 
 Otherwise, you'll have to download the plugin (built package)  via the [Plugin Garden]() (coming soon).

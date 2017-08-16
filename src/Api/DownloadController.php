@@ -2,7 +2,6 @@
 
 namespace Dwnload\WpEmailDownload\Api;
 
-use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\Http\Services\RegisterGetRoute;
 use WP_REST_Request;
@@ -24,18 +23,13 @@ class DownloadController extends RegisterGetRoute {
     /** @var Api $api */
     protected $api;
 
-    /** @var Settings $settings */
-    protected $settings;
-
     /**
      * DownloadController constructor.
      *
      * @param Api $api
-     * @param Settings $settings
      */
-    public function __construct( Api $api, Settings $settings ) {
+    public function __construct( Api $api ) {
         $this->api = $api;
-        $this->settings = $settings;
     }
 
     /**
