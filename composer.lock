@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "df3cbd3f0bd7d3286ee7b2facd4229b5",
+    "content-hash": "345f99ac3fe8494a8bc7bfe7ecf66753",
     "packages": [
         {
             "name": "composer/installers",
@@ -266,16 +266,16 @@
         },
         {
             "name": "dwnload/wp-settings-api",
-            "version": "2.1.2",
+            "version": "2.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwnload/WpSettingsApi.git",
-                "reference": "a888a89a8daa09eeb6bcf6cfeb3bce44338ff443"
+                "reference": "05b545bbc8f1f78aab087f2a9b4467cd053ab051"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/a888a89a8daa09eeb6bcf6cfeb3bce44338ff443",
-                "reference": "a888a89a8daa09eeb6bcf6cfeb3bce44338ff443",
+                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/05b545bbc8f1f78aab087f2a9b4467cd053ab051",
+                "reference": "05b545bbc8f1f78aab087f2a9b4467cd053ab051",
                 "shasum": ""
             },
             "require": {
@@ -290,8 +290,8 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Dwnload\\WPSettingsApi\\": "src",
-                    "Dwnload\\WPSettingsApi\\Tests\\": "tests"
+                    "Dwnload\\WpSettingsApi\\": "src",
+                    "Dwnload\\WpSettingsApi\\Tests\\": "tests"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -307,7 +307,7 @@
                 }
             ],
             "description": "A PHP class abstraction that removes all the headaches of the WordPress settings API under the hood and builds a nice options panel on the fly.",
-            "time": "2017-08-15T18:52:58+00:00"
+            "time": "2017-08-16T21:56:40+00:00"
         },
         {
             "name": "egulias/email-validator",
