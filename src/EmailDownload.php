@@ -3,7 +3,7 @@
 namespace Dwnload\WpEmailDownload;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\PluginUpdater;
-use Dwnload\WpEmailDownload\Admin\SettingsApi;
+use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\DownloadController;
 use Dwnload\WpEmailDownload\Api\Scripts;
@@ -76,7 +76,7 @@ class EmailDownload {
         $this->getInit()
             ->add( $app )
             ->add( new WpSettingsApi( $app ) )
-            ->add( new SettingsApi() )
+            ->add( new Settings() )
             ->add( new Scripts() )
             ->add( new SubscriptionController( $api ) )
             ->add( new DownloadController( $api ) )

@@ -12,11 +12,11 @@ use Dwnload\WpSettingsApi\Settings\SectionManager;
 use TheFrosty\WP\Utils\WpHooksInterface;
 
 /**
- * Class SettingsApi
+ * Class Settings
  *
  * @package Dwnload\WpEmailDownload\Admin
  */
-class SettingsApi implements WpHooksInterface {
+class Settings implements WpHooksInterface {
 
     const SETTING_ID_S = 'email_download_%s';
     const LICENSE_SETTING = 'license';
