@@ -2,7 +2,6 @@
 
 namespace Dwnload\WpEmailDownload;
 
-use Dwnload\EddSoftwareLicenseManager\Edd\PluginUpdater;
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\DownloadController;
@@ -56,12 +55,6 @@ class EmailDownload {
      * Initiate all class hookups.
      */
     public function hookup() {
-        if ( is_admin() ) {
-            $this->getInit()
-                ->add( new PluginUpdater( $this->getUpdaterArgs() ) )
-                ->initialize();
-        }
-
         $app = new App( [
             'domain' => 'email-download',
             'file' => dirname( __DIR__ ) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
@@ -69,7 +62,7 @@ class EmailDownload {
             'menu-title' => 'Email Download', // Title found in menu
             'page-title' => 'Email Download Settings', // Title output at top of settings page
             'prefix' => 'dwnload_email_download',
-            'version' => '0.4.0',
+            'version' => self::getPluginData()['Version'],
         ] );
 
         $api = new Api();
