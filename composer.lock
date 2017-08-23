@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b3c438b480f79bc6b0bf1f3047b10c2",
+    "content-hash": "c1f2c65ea4015588ba9dc4512f90d3e0",
     "packages": [
         {
             "name": "composer/installers",
@@ -222,16 +222,16 @@
         },
         {
             "name": "dwnload/wp-settings-api",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwnload/WpSettingsApi.git",
-                "reference": "317d41f8bb2e44caea38c2c55f052490458dc3d5"
+                "reference": "f8b4eee578d8381d00c09899a8fc7a9f80245e26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/317d41f8bb2e44caea38c2c55f052490458dc3d5",
-                "reference": "317d41f8bb2e44caea38c2c55f052490458dc3d5",
+                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/f8b4eee578d8381d00c09899a8fc7a9f80245e26",
+                "reference": "f8b4eee578d8381d00c09899a8fc7a9f80245e26",
                 "shasum": ""
             },
             "require": {
@@ -263,7 +263,7 @@
                 }
             ],
             "description": "A PHP class abstraction that removes all the headaches of the WordPress settings API under the hood and builds a nice options panel on the fly.",
-            "time": "2017-08-22T22:27:43+00:00"
+            "time": "2017-08-22T22:40:24+00:00"
         },
         {
             "name": "egulias/email-validator",
