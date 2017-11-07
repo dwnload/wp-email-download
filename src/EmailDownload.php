@@ -2,6 +2,8 @@
 
 namespace Dwnload\WpEmailDownload;
 
+use Dwnload\EddSoftwareLicenseManager\Edd\LicenseManager;
+use Dwnload\EddSoftwareLicenseManager\Edd\PluginUpdater;
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\DownloadController;
@@ -10,6 +12,7 @@ use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
+use Dwnload\WpSettingsApi\Api\Options;
 use Dwnload\WpSettingsApi\App;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WP\Utils\Init;
@@ -22,6 +25,8 @@ use TheFrosty\WP\Utils\Init;
 class EmailDownload {
 
     const API_URL = 'https://plugingarden.dwnload.io/';
+    const PLUGIN_NAME = 'Email Download';
+    const PLUGIN_ITEM_ID = 11;
     const ROUTE_NAMESPACE = 'dwnload/v1';
     const SETTING_API_KEY = 'dwnload_api_key';
 
@@ -65,16 +70,46 @@ class EmailDownload {
             'version' => self::getPluginData()['Version'],
         ] );
 
+        $license_args = [
+            'api_url' => self::API_URL,
+            'plugin_file' => self::getFile(),
+            'api_data' => [
+                'version' => $app->getVersion(), // current version number
+                'license' => Options::getOption(
+                    Settings::LICENSE_SETTING,
+                    sprintf( Settings::SETTING_ID_S, Settings::LICENSE_SETTING )
+                ), // license key (used get_option above to retrieve from DB)
+                'item_name' => self::PLUGIN_NAME, // name of this plugin (matching your EDD Download title)
+                'item_id' => self::PLUGIN_ITEM_ID,
+                'author' => 'Austin Passy', // author of this plugin
+                'beta' => isset( $use_beta ),
+            ],
+            'item_id' => self::PLUGIN_ITEM_ID,
+            'name' => plugin_basename( self::getFile() ),
+            'slug' => basename( self::getFile(), '.php' ),
+            'version' => $app->getVersion(),
+            'wp_override' => false,
+            'beta' => isset( $use_beta ),
+        ];
+
         $api = new Api();
+        $license_manager = new LicenseManager( $app, $license_args );
         $this->getInit()
             ->add( $app )
             ->add( new WpSettingsApi( $app ) )
-            ->add( new Settings() )
+            ->add( new Settings( $license_manager ) )
             ->add( new Scripts() )
             ->add( new SubscriptionController( $api ) )
             ->add( new DownloadController( $api ) )
             ->add( new ShortcodeRegistration( new Shortcode( 'email_to_download', new Handler( $api ) ) ) )
             ->initialize();
+
+        if ( is_admin() ) {
+            $this->getInit()
+                ->add( new PluginUpdater( $license_args ) )
+                ->add( $license_manager )
+                ->initialize();
+        }
     }
 
     /**

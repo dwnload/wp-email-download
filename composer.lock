@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1f2c65ea4015588ba9dc4512f90d3e0",
+    "content-hash": "85519ffc61c21ae06238a1539157967d",
     "packages": [
         {
             "name": "composer/installers",
@@ -221,6 +221,50 @@
             "time": "2017-02-16T13:24:20+00:00"
         },
         {
+            "name": "dwnload/edd-software-license-manager",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dwnload/EddSoftwareLicenseManager.git",
+                "reference": "4be00689fb96276cd3f30098186a98881d744890"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dwnload/EddSoftwareLicenseManager/zipball/4be00689fb96276cd3f30098186a98881d744890",
+                "reference": "4be00689fb96276cd3f30098186a98881d744890",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~1.0",
+                "php": ">=7.0.4",
+                "thefrosty/wp-utilities": "^0.2.2"
+            },
+            "require-dev": {
+                "10up/wp_mock": "dev-dev",
+                "wp-coding-standards/wpcs": "^0.9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Dwnload\\EddSoftwareLicenseManager\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Austin Passy",
+                    "email": "thefrosty@users.noreply.github.com",
+                    "homepage": "https://austin.passy.co",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP class abstraction for managing WordPress plugin licenses and auto-updates that are sold on an Easy Digital Downloads store.",
+            "time": "2017-11-06 23:48:29"
+        },
+        {
             "name": "dwnload/wp-settings-api",
             "version": "2.1.5",
             "source": {
@@ -363,7 +407,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dwnload/edd-software-license-manager": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
