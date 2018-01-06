@@ -1,5 +1,11 @@
 # Email Download #
 
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/dwnload/wp-email-download.svg)]()
+[![Latest Stable Version](https://img.shields.io/packagist/v/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
+[![Total Downloads](https://img.shields.io/packagist/dt/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
+[![License](https://img.shields.io/packagist/l/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
+[![Build Status](https://travis-ci.org/dwnload/wp-email-download.svg?branch=master)](https://travis-ci.org/dwnload/wp-email-download)
+
 ### Allow users to download any WordPress managed file if they're subscribed to your MailChimp list
 
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
