@@ -5,7 +5,7 @@
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  
 **Requires at least:** 4.7  
-**Tested up to**: 4.8  
+**Tested up to**: 4.9  
 **Requires PHP**: 7.0.1  
 **Stable tag**: master  
 **License**: GPLv2 or later  

@@ -14,6 +14,7 @@ use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
 use Dwnload\WpSettingsApi\Api\Options;
 use Dwnload\WpSettingsApi\App;
+use Dwnload\WpSettingsApi\AppFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WP\Utils\Init;
 
@@ -60,7 +61,7 @@ class EmailDownload {
      * Initiate all class hookups.
      */
     public function hookup() {
-        $app = new App( [
+        $app = AppFactory::createApp( [
             'domain' => 'email-download',
             'file' => dirname( __DIR__ ) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
             'menu-slug' => 'dwnload-email-download',
@@ -95,7 +96,6 @@ class EmailDownload {
         $api = new Api();
         $license_manager = new LicenseManager( $app, $license_args );
         $this->getInit()
-            ->add( $app )
             ->add( new WpSettingsApi( $app ) )
             ->add( new Settings( $license_manager ) )
             ->add( new Scripts() )
