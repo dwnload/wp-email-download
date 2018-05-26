@@ -45,12 +45,12 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
     }
 
     /**
-     *
+     * @param bool $force Force refresh.
      * @return array
      */
-    public function getListsArray(): array {
+    public function getListsArray( bool $force = false ): array {
         $array = [];
-        $response = $this->getLists();
+        $response = $this->getLists( $force );
 
         if ( isset( $response['lists'] ) ) {
             foreach ( $response['lists'] as $list ) {
@@ -62,19 +62,28 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp {
     }
 
     /**
+     * @param bool $force Force refresh.
      * @return array
      */
-    protected function getLists(): array {
-        $reflection = new \ReflectionClass( parent::class );
+    protected function getLists( bool $force = false ): array {
+        try {
+            $reflection = new \ReflectionClass( parent::class );
+        } catch ( \Exception $exception ) {
+            return [];
+        }
         $api_key = $reflection->getProperty( 'api_key' );
         $api_key->setAccessible( true );
         $transient = sprintf( 'dwnload/mailchimp_lists_%s', base64_encode( $api_key ) );
         $api_key->setAccessible( false );
 
         if ( ( $response = get_transient( $transient ) ) === false ) {
-            $response = $this->get( 'lists' );
-            if ( is_array( $response ) ) {
-                set_transient( $transient, $response, WEEK_IN_SECONDS );
+            try {
+                $response = $this->get( 'lists' );
+                if ( is_array( $response ) && $force === false ) {
+                    set_transient( $transient, $response, DAY_IN_SECONDS );
+                }
+            } catch ( \Exception $exception ) {
+                return [];
             }
         }
 

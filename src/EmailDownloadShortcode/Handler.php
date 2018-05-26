@@ -167,7 +167,7 @@ class Handler implements ShortcodeHandler {
 
         if ( ! empty( $api_key = Options::getOption( Mailchimp::SETTING_API_KEY ) ) ) {
             try {
-                return ( new MailChimp( $api_key ) )->getListsArray();
+                return ( new MailChimp( $api_key ) )->getListsArray( true );
             } catch ( \Exception $e ) {
                 return $options;
             }
