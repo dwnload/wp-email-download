@@ -139,4 +139,21 @@ final class Api {
                 new DNSCheckValidation(),
             ] ) );
     }
+
+    /**
+     * Delete the transient data.
+     *
+     * @return false|int
+     */
+    public function deleteTransientData() {
+        global $wpdb;
+
+        return $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+                $wpdb->esc_like( '_transient_dwnload/mailchimp_lists_' ) . '%',
+                $wpdb->esc_like( '_transient_timeout_dwnload/mailchimp_lists_' ) . '%'
+            )
+        );
+    }
 }
