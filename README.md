@@ -12,7 +12,7 @@
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  
 **Requires at least:** 4.7  
 **Tested up to**: 4.9  
-**Requires PHP**: 7.0.1  
+**Requires PHP**: 7.1.0  
 **Stable tag**: master  
 **License**: GPLv2 or later  
 **License URI**: http://www.gnu.org/licenses/gpl-2.0.html  
@@ -40,7 +40,7 @@ shortcode builder).
 To install this plugin, using Composer:
 
 ```
-composer require dwnload/wp-email-download:~0.4
+composer require dwnload/wp-email-download:~0.5
 ```
 
 Otherwise, you'll have to download the plugin (built package)  via the [Plugin Garden]() (coming soon).
