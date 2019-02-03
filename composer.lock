@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a5c9681b428abf922d8d60448fe66a1",
+    "content-hash": "35cea8d53f79b00e001fab6edb85abbe",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "049797d727261bf27f2690430d935067710049c2"
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/049797d727261bf27f2690430d935067710049c2",
-                "reference": "049797d727261bf27f2690430d935067710049c2",
+                "url": "https://api.github.com/repos/composer/installers/zipball/cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b",
                 "shasum": ""
             },
             "require": {
@@ -124,7 +124,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2017-12-29T09:13:20+00:00"
+            "time": "2018-08-27T06:10:37+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -225,23 +225,23 @@
         },
         {
             "name": "dwnload/edd-software-license-manager",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwnload/EddSoftwareLicenseManager.git",
-                "reference": "585c936245907bea94278076fe40559997d21637"
+                "reference": "74885b44dd1990f27ca47b26dfc42f94acc250e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwnload/EddSoftwareLicenseManager/zipball/585c936245907bea94278076fe40559997d21637",
-                "reference": "585c936245907bea94278076fe40559997d21637",
+                "url": "https://api.github.com/repos/dwnload/EddSoftwareLicenseManager/zipball/74885b44dd1990f27ca47b26dfc42f94acc250e0",
+                "reference": "74885b44dd1990f27ca47b26dfc42f94acc250e0",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "~1.0",
-                "dwnload/wp-settings-api": "^2.1.4",
-                "php": ">=7.0.4",
-                "thefrosty/wp-utilities": "^0.2.2"
+                "dwnload/wp-settings-api": "^2.6.0",
+                "php": ">=7.1",
+                "thefrosty/wp-utilities": "^1.3.1"
             },
             "require-dev": {
                 "10up/wp_mock": "dev-dev",
@@ -266,37 +266,38 @@
                 }
             ],
             "description": "A PHP class abstraction for managing WordPress plugin licenses and auto-updates that are sold on an Easy Digital Downloads store.",
-            "time": "2017-11-07T19:46:20+00:00"
+            "time": "2019-02-03T18:51:32+00:00"
         },
         {
             "name": "dwnload/wp-settings-api",
-            "version": "2.2.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwnload/WpSettingsApi.git",
-                "reference": "a75cccdd831662a4e6e1ac3808bb000068c1ffd7"
+                "reference": "639d0b8d2713a001f670bb6811a6100d40a45867"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/a75cccdd831662a4e6e1ac3808bb000068c1ffd7",
-                "reference": "a75cccdd831662a4e6e1ac3808bb000068c1ffd7",
+                "url": "https://api.github.com/repos/dwnload/WpSettingsApi/zipball/639d0b8d2713a001f670bb6811a6100d40a45867",
+                "reference": "639d0b8d2713a001f670bb6811a6100d40a45867",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "~1.0",
                 "php": ">=7.0.4",
-                "thefrosty/wp-utilities": "^0.2.2"
+                "thefrosty/wp-utilities": "^1.2"
             },
             "require-dev": {
                 "10up/wp_mock": "dev-dev",
+                "inpsyde/php-coding-standards": "^0.13.3",
+                "phpmd/phpmd": "^2.6",
                 "phpunit/phpunit": "6.*",
-                "wp-coding-standards/wpcs": "^0.13.1"
+                "wp-phpunit/wp-phpunit": "4.9.*"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Dwnload\\WpSettingsApi\\": "src",
-                    "Dwnload\\WpSettingsApi\\Tests\\": "tests"
+                    "Dwnload\\WpSettingsApi\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -312,20 +313,20 @@
                 }
             ],
             "description": "A PHP class abstraction that removes all the headaches of the WordPress settings API under the hood and builds a nice options panel on the fly.",
-            "time": "2018-01-06T20:53:12+00:00"
+            "time": "2018-11-21T21:13:22+00:00"
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.4",
+            "version": "2.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "8790f594151ca6a2010c6218e09d96df67173ad3"
+                "reference": "709f21f92707308cdf8f9bcfa1af4cb26586521e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/8790f594151ca6a2010c6218e09d96df67173ad3",
-                "reference": "8790f594151ca6a2010c6218e09d96df67173ad3",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/709f21f92707308cdf8f9bcfa1af4cb26586521e",
+                "reference": "709f21f92707308cdf8f9bcfa1af4cb26586521e",
                 "shasum": ""
             },
             "require": {
@@ -369,29 +370,38 @@
                 "validation",
                 "validator"
             ],
-            "time": "2018-04-10T10:11:19+00:00"
+            "time": "2018-12-04T22:38:24+00:00"
         },
         {
             "name": "thefrosty/wp-utilities",
-            "version": "0.2.2",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thefrosty/wp-utilities.git",
-                "reference": "efbaf68da7aa18c533d0151e1953f2f619c70a6c"
+                "reference": "cd619f8d1f7fd7bf998b0ba97a892dc0384a7c0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thefrosty/wp-utilities/zipball/efbaf68da7aa18c533d0151e1953f2f619c70a6c",
-                "reference": "efbaf68da7aa18c533d0151e1953f2f619c70a6c",
+                "url": "https://api.github.com/repos/thefrosty/wp-utilities/zipball/cd619f8d1f7fd7bf998b0ba97a892dc0384a7c0f",
+                "reference": "cd619f8d1f7fd7bf998b0ba97a892dc0384a7c0f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0"
             },
+            "require-dev": {
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "suggest": {
+                "pimple/pimple": "",
+                "symfony/http-foundation": ""
+            },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "TheFrosty\\WP\\Utils\\": "src/"
+                    "TheFrosty\\WpUtilities\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -401,12 +411,13 @@
             "authors": [
                 {
                     "name": "Austin Passy",
-                    "email": "austin@passy.co",
-                    "homepage": "https://github.com/thefrosty"
+                    "email": "thefrosty@users.noreply.github.com",
+                    "homepage": "https://austin.passy.co",
+                    "role": "Developer"
                 }
             ],
             "description": "A library containing my standard development resources",
-            "time": "2017-07-28T21:05:31+00:00"
+            "time": "2019-01-07T21:23:39+00:00"
         }
     ],
     "packages-dev": [],
@@ -416,7 +427,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.4"
+        "php": ">=7.1"
     },
     "platform-dev": []
 }
