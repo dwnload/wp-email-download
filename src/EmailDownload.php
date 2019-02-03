@@ -13,10 +13,9 @@ use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
 use Dwnload\WpSettingsApi\Api\Options;
-use Dwnload\WpSettingsApi\App;
 use Dwnload\WpSettingsApi\AppFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use TheFrosty\WP\Utils\Init;
+use TheFrosty\WpUtilities\Plugin\PluginFactory;
 
 /**
  * Class EmailDownload
@@ -31,31 +30,8 @@ class EmailDownload {
     const ROUTE_NAMESPACE = 'dwnload/v1';
     const SETTING_API_KEY = 'dwnload_api_key';
 
-    /**
-     * @var Init $init
-     */
-    private $init;
-
     /** @var string $file */
     private static $file;
-
-    /**
-     * @param Init $init
-     *
-     * @return EmailDownload
-     */
-    public function setInit( Init $init ): EmailDownload {
-        $this->init = $init;
-
-        return $this;
-    }
-
-    /**
-     * @return Init
-     */
-    public function getInit(): Init {
-        return $this->init;
-    }
 
     /**
      * Initiate all class hookups.
@@ -93,9 +69,10 @@ class EmailDownload {
             'beta' => isset( $use_beta ),
         ];
 
+        $plugin = PluginFactory::create('dwnload-email-download', self::getFile());
         $api = new Api();
         $license_manager = new LicenseManager( $app, $license_args );
-        $this->getInit()
+        $plugin
             ->add( new WpSettingsApi( $app ) )
             ->add( new Settings( $license_manager ) )
             ->add( new Scripts() )
@@ -105,7 +82,7 @@ class EmailDownload {
             ->initialize();
 
         if ( is_admin() ) {
-            $this->getInit()
+            $plugin
                 ->add( new PluginUpdater( $license_args ) )
                 ->add( $license_manager )
                 ->initialize();
