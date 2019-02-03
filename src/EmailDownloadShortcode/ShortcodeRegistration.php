@@ -4,7 +4,7 @@ namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
 use Dwnload\WpEmailDownload\ShortcodeApi\AbstractShortcode;
 use Dwnload\WpEmailDownload\ShortcodeApi\ShortcodeInterface;
-use TheFrosty\WP\Utils\WpHooksInterface;
+use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
 
 /**
  * Class ShortcodeRegistration
