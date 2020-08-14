@@ -2,7 +2,6 @@
   "name": "dwnload/wp-email-download",
   "description": "Allow users to download any WordPress managed file if they're subscribed to you MailChimp list",
   "type": "wordpress-plugin",
-  "version": "0.4.3",
   "license": "GPL-2.0-or-later",
   "keywords": ["wordpress-plugin", "downloader", "email-subscription", "mailchimp", "wp-api"],
   "authors": [
@@ -29,6 +28,5 @@
       "src/includes/functions.php"
     ]
   },
-  "minimum-stability": "stable",
-  "preferred-install": "dist"
+  "minimum-stability": "stable"
 }
