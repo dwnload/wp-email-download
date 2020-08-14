@@ -33,6 +33,7 @@ abstract class RouteService implements WpHooksInterface {
         $defaults = [
             'methods' => $method,
             'callback' => $callback,
+            'permission_callback' => '__return_true',
         ];
         $args = wp_parse_args( $args, $defaults );
 
