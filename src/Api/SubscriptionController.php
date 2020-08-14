@@ -40,6 +40,7 @@ class SubscriptionController extends RegisterPostRoute {
 
     /**
      * Registers a REST API route.
+     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute() {
         $this->registerRoute(
@@ -97,7 +98,6 @@ class SubscriptionController extends RegisterPostRoute {
                 [ 'status' => \WP_Http::OK ]
             ) );
         }
-        error_log( $api_key );
 
         // Count submissions
         if ( ! $this->canSubmitForm( time() ) ) {
