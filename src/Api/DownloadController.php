@@ -34,6 +34,7 @@ class DownloadController extends RegisterGetRoute {
 
     /**
      * Registers a REST API route.
+     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute() {
         $this->registerRoute(
@@ -144,8 +145,6 @@ class DownloadController extends RegisterGetRoute {
             if ( $remote_file ) {
                 $file = wp_remote_head( $file_path );
                 if ( ! is_wp_error( $file ) && ! empty( $file['headers']['content-length'] ) ) {
-                    error_log( '$file[\'headers\'][\'content-length\']' . $file['headers']['content-length'] );
-
                     return $file['headers']['content-length'];
                 }
             } else {
