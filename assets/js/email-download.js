@@ -1,35 +1,35 @@
 /* global jQuery, emailDownload */
 (function ($) {
-  "use strict";
+  'use strict'
 
   $(document).ready(function () {
-    var $notice = $('.EmailDownload__notice > p');
+    const $notice = $('.EmailDownload__notice > p')
     $('form.EmailDownload__form').on('submit', function (e) {
-      e.preventDefault();
-      var $this = $(this),
-        $button = $this.find('button');
+      e.preventDefault()
+      const $this = $(this)
+      const $button = $this.find('button')
 
       $.ajax({
-        method: "POST",
+        method: 'POST',
         url: emailDownload.root + emailDownload.namespace + emailDownload.route + $('input.EmailDownload__input').val(),
         data: $(this).serialize(),
         beforeSend: function (xhr) {
-          xhr.setRequestHeader('X-WP-Nonce', emailDownload.nonce);
-          $button.attr('disabled', true);
+          xhr.setRequestHeader('X-WP-Nonce', emailDownload.nonce)
+          $button.attr('disabled', true)
         },
         success: function (response) {
           if (typeof response.success !== 'undefined' && response.success) {
-            $this.parent().slideUp().remove();
-            document.location = response.url;
+            $this.parent().slideUp().remove()
+            document.location = response.url
           }
-          var text = typeof response.message !== 'undefined' ? response.message : emailDownload.failure;
-          $notice.text(text).parent().show();
-          $button.attr('disabled', false);
+          var text = typeof response.message !== 'undefined' ? response.message : emailDownload.failure
+          $notice.text(text).parent().show()
+          $button.attr('disabled', false)
         },
         fail: function (response) {
-          alert('Unknown Error');
+          alert('Unknown Error')
         }
-      });
-    });
-  });
-}(jQuery));
+      })
+    })
+  })
+}(jQuery))
