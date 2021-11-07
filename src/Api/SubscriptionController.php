@@ -34,7 +34,7 @@ class SubscriptionController extends RegisterPostRoute {
     /**
      * Add class hooks.
      */
-    public function addHooks() {
+    public function addHooks(): void {
         parent::addHooks();
     }
 

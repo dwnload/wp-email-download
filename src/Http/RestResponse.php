@@ -11,7 +11,7 @@ use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
  */
 class RestResponse implements WpHooksInterface {
 
-    public function addHooks() {
+    public function addHooks(): void {
         add_filter( 'rest_prepare_post', [ $this, 'modifyPostsResponse' ], 10, 1 );
     }
 

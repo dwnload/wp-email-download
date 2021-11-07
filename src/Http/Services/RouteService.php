@@ -16,7 +16,7 @@ abstract class RouteService implements WpHooksInterface {
     /**
      * Adds hooks
      */
-    public function addHooks() {
+    public function addHooks(): void {
         add_action( 'rest_api_init', [ $this, 'initializeRoute' ] );
     }
 
