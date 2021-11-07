@@ -19,7 +19,7 @@ class Scripts implements WpHooksInterface {
     /**
      * Add class hooks
      */
-    public function addHooks() {
+    public function addHooks(): void {
         add_action( 'wp_enqueue_scripts', [ $this, 'registerScripts' ] );
     }
 

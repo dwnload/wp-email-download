@@ -1,4 +1,0 @@
-/* global jQuery */
-(function ($) {
-
-}(jQuery));

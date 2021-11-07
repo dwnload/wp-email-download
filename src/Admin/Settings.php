@@ -2,14 +2,13 @@
 
 namespace Dwnload\WpEmailDownload\Admin;
 
-use Dwnload\EddSoftwareLicenseManager\Edd\LicenseManager;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpSettingsApi\Api\Options;
 use Dwnload\WpSettingsApi\Api\SettingField;
 use Dwnload\WpSettingsApi\Api\SettingSection;
-use Dwnload\WpSettingsApi\App;
 use Dwnload\WpSettingsApi\Settings\FieldManager;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
+use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
 
 /**
@@ -23,32 +22,13 @@ class Settings implements WpHooksInterface {
     const LICENSE_SETTING = 'license';
     const MAILCHIMP_SETTING = 'mailchimp';
 
-    /** @var LicenseManager $license_manager */
-    protected $license_manager;
-
-    /**
-     * WpSettingsApi constructor.
-     *
-     * @param LicenseManager $license_manager
-     */
-    public function __construct( LicenseManager $license_manager ) {
-        $this->license_manager = $license_manager;
-    }
-
-    /**
-     * @return LicenseManager $license_manager
-     */
-    public function getLicenseManager(): LicenseManager {
-        return $this->license_manager;
-    }
-
     /**
      * Register our callback to the BB WP Settings API action hook
      * `App::ACTION_PREFIX . 'init'`. This custom action passes two parameters
      * so you have to register a priority and the parameter count.
      */
-    public function addHooks() {
-        add_action( App::ACTION_PREFIX . 'init', [ $this, 'init' ], 10, 2 );
+    public function addHooks(): void {
+        add_action( WpSettingsApi::ACTION_PREFIX . 'init', [ $this, 'init' ], 10, 2 );
     }
 
     /**
@@ -113,26 +93,5 @@ class Settings implements WpHooksInterface {
             // Add the field
             $field_manager->addField( $field );
         }
-
-        /**
-         * License Settings Section
-         */
-        $section_id = $section_manager->addSection(
-            new SettingSection( [
-                SettingSection::SECTION_ID => sprintf( self::SETTING_ID_S, self::LICENSE_SETTING ),
-                SettingSection::SECTION_TITLE => 'License Manager',
-            ] )
-        );
-
-        $field = new SettingField();
-        $field->setName( self::LICENSE_SETTING );
-        $field->setDescription( esc_html__( 'Enter your licence key to enable updates.', 'email-download' ) );
-        $field->setLabel( esc_html__( 'License Key', 'email-download' ) );
-        $field->setType( 'text' );
-        $field->setSectionId( $section_id );
-        $field->setObfuscate();
-        $this->getLicenseManager()->setSettingField( $field );
-
-        $field_manager->addField( $field );
     }
 }

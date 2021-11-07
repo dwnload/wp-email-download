@@ -27,7 +27,7 @@ class ShortcodeRegistration extends AbstractShortcode implements WpHooksInterfac
         $this->shortcode = $shortcode;
     }
 
-    public function addHooks() {
+    public function addHooks(): void {
         add_action( 'init', [ $this, 'addShortcode' ] );
     }
 
