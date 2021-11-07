@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\Api;
 
@@ -56,10 +56,10 @@ final class Api {
         static $computer_id;
 
         if ( ! $computer_id ) {
-            $computer_id = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
-            $computer_id .= isset( $_SERVER['LOCAL_ADDR'] ) ? $_SERVER['LOCAL_ADDR'] : '';
-            $computer_id .= isset( $_SERVER['LOCAL_PORT'] ) ? $_SERVER['LOCAL_PORT'] : '';
-            $computer_id .= isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
+            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
+            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
         }
 
         return $computer_id;
