@@ -105,7 +105,7 @@ class Handler implements ShortcodeHandler {
      *
      * @return string
      */
-    public function handler( $atts, $content = '', $tag ): string {
+    public function handler( $atts, $content, $tag ): string {
         $this->atts = $parsed_atts = shortcode_atts( $this->getDefaults(), $atts );
 
         $list_id = $parsed_atts[ self::ATTRIBUTE_LIST_ID ];
@@ -128,9 +128,8 @@ class Handler implements ShortcodeHandler {
         ob_start();
         $api = $this->api;
         include __DIR__ . '/views/form.php';
-        $content = ob_get_clean();
 
-        return $content;
+	    return ob_get_clean();
     }
 
     public function registerShortcodeUI() {
