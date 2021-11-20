@@ -17,7 +17,7 @@
     "drewm/mailchimp-api": "2.4",
     "dwnload/wp-settings-api": "^3.3",
     "egulias/email-validator": "~2.1",
-    "thefrosty/wp-utilities": "^2.4",
+    "thefrosty/wp-utilities": "^2.5.1",
     "ext-openssl": "*",
     "ext-json": "*"
   },
