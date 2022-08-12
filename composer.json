@@ -12,12 +12,24 @@
       "role": "Developer"
     }
   ],
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "roots/wordpress-core-installer": true
+    },
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.4"
+    },
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
   "require": {
-    "php": "^7.4|^8.0",
+    "php": "^7.4 || ^8.0",
     "drewm/mailchimp-api": "2.4",
     "dwnload/wp-settings-api": "^3.3",
     "egulias/email-validator": "~2.1",
-    "thefrosty/wp-utilities": "^2.5.1",
+    "thefrosty/wp-utilities": "^2.8",
     "ext-openssl": "*",
     "ext-json": "*"
   },
