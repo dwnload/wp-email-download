@@ -1,5 +1,13 @@
 .idea
 .DS_Store
+.npm
+.eslintcache
+*.tgz
+build/Release
+node_modules/
 vendor
 wordpress
 composer.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
