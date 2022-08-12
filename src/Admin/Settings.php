@@ -9,14 +9,14 @@ use Dwnload\WpSettingsApi\Api\SettingSection;
 use Dwnload\WpSettingsApi\Settings\FieldManager;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
+use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
 
 /**
  * Class Settings
  *
  * @package Dwnload\WpEmailDownload\Admin
  */
-class Settings implements WpHooksInterface {
+class Settings extends AbstractHookProvider {
 
     const SETTING_ID_S = 'email_download_%s';
     const LICENSE_SETTING = 'license';
@@ -28,27 +28,23 @@ class Settings implements WpHooksInterface {
      * so you have to register a priority and the parameter count.
      */
     public function addHooks(): void {
-        add_action( WpSettingsApi::ACTION_PREFIX . 'init', [ $this, 'init' ], 10, 2 );
+        add_action( WpSettingsApi::ACTION_PREFIX . 'init', [ $this, 'init' ], 10, 3 );
     }
 
     /**
      * Initiate our setting to the Section & Field Manager classes.
-     *
-     * SettingField requires the following settings (passes as an array or set explicitly):
-     * [
-     *  SettingField::NAME
-     *  SettingField::LABEL
-     *  SettingField::DESC
-     *  SettingField::TYPE
-     *  SettingField::SECTION_ID
-     * ]
-     *
-     * @see SettingField for additional options for each field passed to the output
-     *
      * @param SectionManager $section_manager
      * @param FieldManager $field_manager
+     * @param WpSettingsApi $wp_settings_api
      */
-    public function init( SectionManager $section_manager, FieldManager $field_manager ) {
+    public function init(
+        SectionManager $section_manager,
+        FieldManager $field_manager,
+        WpSettingsApi $wp_settings_api
+    ): void {
+        if (!$wp_settings_api->isCurrentMenuSlug($this->getPlugin()->getSlug())) {
+            return;
+        }
         /**
          * License Settings Section
          */
