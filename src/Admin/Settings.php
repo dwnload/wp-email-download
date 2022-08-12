@@ -59,7 +59,7 @@ class Settings implements WpHooksInterface {
             ] )
         );
 
-        $field = new SettingField();
+        $field = new SettingField([]);
         $field->setName( Mailchimp::SETTING_API_KEY );
         $field->setDescription(
             sprintf(
@@ -82,7 +82,7 @@ class Settings implements WpHooksInterface {
             } catch ( \Exception $e ) {
                 $description = $e->getMessage();
             }
-            $field = new SettingField();
+            $field = new SettingField([]);
             $field->setName( Mailchimp::SETTING_LIST_ID );
             $field->setLabel( esc_html__( 'Your Lists', 'email-download' ) );
             $field->setDescription( $description ?? '' );
