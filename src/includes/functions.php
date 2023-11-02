@@ -37,7 +37,7 @@ function version_error()
 function php_version_text()
 {
     return sprintf(
-        esc_html__('%s plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 7.4 or higher.',
+        esc_html__('%s plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 8.0 or higher.',
             'email-download'),
         PLUGIN_NAME
     );

@@ -34,7 +34,7 @@ class EmailDownload
     /**
      * Initiate all class hookups.
      */
-    public function hookup()
+    public function hookup(): void
     {
         $settings = SettingsApiFactory::create([
             'domain' => 'email-download',
@@ -61,7 +61,7 @@ class EmailDownload
     /**
      * @param string $file
      */
-    public static function setFile(string $file)
+    public static function setFile(string $file): void
     {
         self::$file = $file;
     }
