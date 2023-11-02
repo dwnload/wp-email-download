@@ -29,7 +29,7 @@
     "php": "~8.0",
     "drewm/mailchimp-api": "2.4",
     "dwnload/wp-settings-api": "^3.3",
-    "egulias/email-validator": "~2.1",
+    "egulias/email-validator": "~3.2",
     "thefrosty/wp-utilities": "^3.2",
     "ext-openssl": "*",
     "ext-json": "*"
