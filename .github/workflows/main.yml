@@ -52,8 +52,8 @@ jobs:
           coverage: xdebug
           tools: composer, cs2pr, phpunit
 
-      - name: Setup WordPress ${{ matrix.wp-versions }}
-        run: bash bin/install-wp-tests.sh wordpress_test wp password localhost ${{ matrix.wp-versions }} true
+#      - name: Setup WordPress ${{ matrix.wp-versions }}
+#        run: bash bin/install-wp-tests.sh wordpress_test wp password localhost ${{ matrix.wp-versions }} true
 
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction
