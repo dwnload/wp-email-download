@@ -27,7 +27,7 @@
   },
   "require": {
     "php": "~8.0",
-    "drewm/mailchimp-api": "2.4",
+    "drewm/mailchimp-api": "2.5.4",
     "dwnload/wp-settings-api": "^3.3",
     "egulias/email-validator": "~2.1",
     "thefrosty/wp-utilities": "^3.2",
