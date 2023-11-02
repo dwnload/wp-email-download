@@ -34,7 +34,7 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "roots/wordpress": "~5.8.1"
+    "roots/wordpress": "~6.3.2"
   },
   "autoload": {
     "psr-4": {
