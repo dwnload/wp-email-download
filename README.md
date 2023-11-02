@@ -4,15 +4,15 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
 [![Total Downloads](https://img.shields.io/packagist/dt/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
 [![License](https://img.shields.io/packagist/l/dwnload/wp-email-download.svg)](https://packagist.org/packages/dwnload/wp-email-download)
-[![Build Status](https://travis-ci.org/dwnload/wp-email-download.svg?branch=master)](https://travis-ci.org/dwnload/wp-email-download)
+![Build Status](https://github.com/dwnload/wp-email-download/actions/workflows/main.yml/badge.svg)
 
 ### Allow users to download any WordPress managed file if they're subscribed to your MailChimp list
 
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  
-**Requires at least:** 5.7  
-**Tested up to**: 5.8  
-**Requires PHP**: 7.4.0  
+**Requires at least:** 6.1  
+**Tested up to**: 6.3  
+**Requires PHP**: 8.0  
 **Stable tag**: master  
 **License**: GPLv2 or later  
 **License URI**: http://www.gnu.org/licenses/gpl-2.0.html
