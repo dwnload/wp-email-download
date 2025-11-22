@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload;
 
@@ -7,12 +9,10 @@ const SHORTCODE_UI_SLUG = 'shortcode-ui';
 
 /**
  * Helper function to return admin notice HTML.
- *
  * @param string $message
  * @param string $class
- *
  */
-function admin_notice(string $message, string $class = 'error')
+function admin_notice(string $message, string $class = 'error'): void
 {
     printf(
         '<div class="notice notice-%s is-dismissible"><p>%s</p></div>',
@@ -24,31 +24,31 @@ function admin_notice(string $message, string $class = 'error')
 /**
  * Admin notice for incompatible versions of PHP.
  */
-function version_error()
+function version_error(): void
 {
     admin_notice(php_version_text(), 'error');
 }
 
 /**
  * String describing the minimum PHP version.
- *
  * @return string
  */
-function php_version_text()
+function php_version_text(): string
 {
     return sprintf(
-        esc_html__('%s plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 8.0 or higher.',
-            'email-download'),
+        esc_html__(
+            '%s plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 8.0 or higher.',
+            'email-download'
+        ),
         PLUGIN_NAME
     );
 }
 
 /**
- * String advising the install of a required plugin.
- *
+ * String advising the installation of a required plugin.
  * @return string
  */
-function missing_shorcode_ui_text()
+function missing_shorcode_ui_text(): string
 {
     if (current_user_can('install_plugins')) {
         $install_url = wp_nonce_url(
@@ -60,16 +60,18 @@ function missing_shorcode_ui_text()
         );
 
         return sprintf(
-            __('%s plugin error: The Shorcode UI plugin is required. View the plugin <a href="%s" class="thickbox open-plugin-details-modal">details</a> or <a href="%s">install it now</a>.',
-                'email-download'),
+            __(
+                '%s plugin error: The Shorcode UI plugin is required. View the plugin <a href="%s" class="thickbox open-plugin-details-modal">details</a> or <a href="%s">install it now</a>.',
+                'email-download'
+            ),
             PLUGIN_NAME,
             esc_url($details_url),
             esc_url($install_url)
         );
-    } else {
-        return sprintf(
-            __('%s plugin error: The Shorcode UI plugin is required.', 'email-download'),
-            PLUGIN_NAME
-        );
     }
+
+    return sprintf(
+        __('%s plugin error: The Shorcode UI plugin is required.', 'email-download'),
+        PLUGIN_NAME
+    );
 }
