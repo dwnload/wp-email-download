@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
-use Dwnload\WpEmailDownload\Api\Api;
+use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\Api\Scripts;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
+use Dwnload\WpSettingsApi\Api\Options;
 use Exception;
 use WP_Error;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
-use Dwnload\WpSettingsApi\Api\Options;
 
 /**
  * Class EmailDownloadHandler
@@ -22,6 +22,7 @@ use Dwnload\WpSettingsApi\Api\Options;
 class Handler implements ShortcodeHandler
 {
 
+    use ApiFactory;
     use ShortcodeUiTrait;
 
     const string ATTRIBUTE_LIST_ID = 'list-id';
@@ -32,14 +33,6 @@ class Handler implements ShortcodeHandler
 
     /** @var string $tag */
     protected string $tag;
-
-    /**
-     * Handler constructor.
-     * @param Api $api
-     */
-    public function __construct(protected Api $api)
-    {
-    }
 
     /**
      * Initiate the registration of the Shorcode UI on plugins_loaded
