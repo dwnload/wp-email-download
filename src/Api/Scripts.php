@@ -7,6 +7,8 @@ namespace Dwnload\WpEmailDownload\Api;
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\Http\Services\RouteService;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
+use function plugins_url;
+use function wp_register_style;
 
 /**
  * Class Scripts
@@ -31,6 +33,7 @@ class Scripts implements WpHooksInterface
      */
     public function registerScripts(): void
     {
+        wp_register_style(self::SCRIPT_HANDLE, plugins_url('assets/css/style.css', EmailDownload::getFile()));
         wp_register_script(
             self::SCRIPT_HANDLE,
             plugins_url('assets/js/email-download.js', EmailDownload::getFile()),

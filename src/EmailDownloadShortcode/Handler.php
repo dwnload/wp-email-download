@@ -6,7 +6,7 @@ namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
-use Dwnload\WpEmailDownload\EmailDownload;
+use Dwnload\WpEmailDownload\Api\Scripts;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
 use Exception;
@@ -26,7 +26,6 @@ class Handler implements ShortcodeHandler
 
     const string ATTRIBUTE_LIST_ID = 'list-id';
     const string ATTRIBUTE_FILE = 'file';
-    const string SCRIPT_HANDLE = 'email-download';
 
     /** @var array $atts */
     protected array $atts = [];
@@ -57,15 +56,6 @@ class Handler implements ShortcodeHandler
                 });
             }
         });
-        add_action('wp_enqueue_scripts', [$this, 'registerScripts']);
-    }
-
-    /**
-     * Register our shortcode output stylesheet.
-     */
-    public function registerScripts(): void
-    {
-        wp_register_style(self::SCRIPT_HANDLE, plugins_url('assets/css/style.css', EmailDownload::getFile()));
     }
 
     /**
@@ -130,15 +120,11 @@ class Handler implements ShortcodeHandler
                 );
             }
             $html .= '</ul></div>';
-            return $html;
+//            return $html;
         }
 
-        if (wp_style_is(self::SCRIPT_HANDLE, 'registered')) {
-            wp_enqueue_style(self::SCRIPT_HANDLE);
-        }
-        if (wp_script_is(self::SCRIPT_HANDLE, 'registered')) {
-            wp_enqueue_script(self::SCRIPT_HANDLE);
-        }
+        wp_enqueue_style(Scripts::SCRIPT_HANDLE);
+        wp_enqueue_script(Scripts::SCRIPT_HANDLE);
 
         ob_start();
         $api = $this->api;
