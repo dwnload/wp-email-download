@@ -50,12 +50,13 @@ class EmailDownload
         $plugin = PluginFactory::create('dwnload-email-download', self::getFile());
         $api = new Api();
         $plugin
-            ->add(new WpSettingsApi($settings))
-            ->add(new Settings())
-            ->add(new Scripts())
-            ->add(new SubscriptionController($api))
+            ->add(new Blocks\EmailDownload())
             ->add(new DownloadController($api))
+            ->add(new Scripts())
+            ->add(new Settings())
+            ->add(new SubscriptionController($api))
             ->add(new ShortcodeRegistration(new Shortcode('email_to_download', new Handler($api))))
+            ->add(new WpSettingsApi($settings))
             ->initialize();
     }
 
