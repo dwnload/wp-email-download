@@ -51,8 +51,8 @@ class Scripts implements WpHooksInterface
                 'namespace' => EmailDownload::ROUTE_NAMESPACE,
                 'route' => SubscriptionController::ROUTE_PREFIX,
                 'nonce' => wp_create_nonce('wp_rest'),
-                'success' => __('Thanks for your submission!', 'your-text-domain'),
-                'failure' => __('Your submission could not be processed.', 'your-text-domain'),
+                'success' => __('Thanks for your submission!', 'email-download'),
+                'failure' => __('Your submission could not be processed.', 'email-download'),
                 'current_user_id' => get_current_user_id(),
             ]
         );

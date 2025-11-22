@@ -29,8 +29,8 @@ trait PaginationTrait
             'current' => max(1, get_query_var('paged')),
             'total' => $wp_query->max_num_pages,
             'mid_size' => 5,
-            'prev_text' => __('&laquo;', 'bb_wp_utilities'),
-            'next_text' => __('&raquo;', 'bb_wp_utilities'),
+            'prev_text' => __('&laquo;', 'email-download'),
+            'next_text' => __('&raquo;', 'email-download'),
             'type' => 'list',
         ]);
 
