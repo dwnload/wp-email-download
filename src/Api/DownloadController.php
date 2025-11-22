@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Dwnload\WpEmailDownload\Api;
 
 use Dwnload\WpEmailDownload\EmailDownload;
-use Dwnload\WpEmailDownload\Http\Services\RegisterGetRoute;
+use TheFrosty\WpUtilities\RestApi\Http\RegisterGetRoute;
 use WP_Error;
 use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 
 /**
  * Class DownloadController
@@ -19,7 +20,6 @@ class DownloadController extends RegisterGetRoute
 {
 
     const string MIME_TYPE = 'application/octet-stream';
-    const string NONCE_NAME = 'time';
     const string ROUTE_FILE_PREFIX = '/download/';
     const string ROUTE_REQUIRED_FIELD = 'data';
 
@@ -33,9 +33,10 @@ class DownloadController extends RegisterGetRoute
 
     /**
      * Registers a REST API route.
+     * @param WP_REST_Server $server
      * @todo add permission_callback to $args param of registerRoute.
      */
-    public function initializeRoute(): void
+    public function initializeRoute(WP_REST_Server $server): void
     {
         $this->registerRoute(
             EmailDownload::ROUTE_NAMESPACE,

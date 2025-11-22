@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Dwnload\WpEmailDownload\Api;
 
 use Dwnload\WpEmailDownload\EmailDownload;
-use Dwnload\WpEmailDownload\Http\Services\RegisterPostRoute;
 use Dwnload\WpSettingsApi\Api\Options;
 use Exception;
+use TheFrosty\WpUtilities\RestApi\Http\RegisterPostRoute;
 use WP_Error;
 use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 
 /**
  * Class SubscriptionController
@@ -34,9 +35,10 @@ class SubscriptionController extends RegisterPostRoute
 
     /**
      * Registers a REST API route.
+     * @param WP_REST_Server $server
      * @todo add permission_callback to $args param of registerRoute.
      */
-    public function initializeRoute(): void
+    public function initializeRoute(WP_REST_Server $server): void
     {
         $this->registerRoute(
             EmailDownload::ROUTE_NAMESPACE,
@@ -61,7 +63,7 @@ class SubscriptionController extends RegisterPostRoute
      */
     public function validateUserEmailSubscription(WP_REST_Request $request): WP_REST_Response
     {
-        if (!check_ajax_referer(self::NONCE_ACTION, false, false)) {
+        if (!check_ajax_referer('wp_rest', false, false)) {
             return rest_ensure_response(
                 new WP_Error(
                     'nonce_error',
