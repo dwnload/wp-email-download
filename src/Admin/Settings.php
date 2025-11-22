@@ -11,7 +11,9 @@ use Dwnload\WpSettingsApi\Api\SettingSection;
 use Dwnload\WpSettingsApi\Settings\FieldManager;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
+use Exception;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
+use function esc_html__;
 
 /**
  * Class Settings
@@ -80,7 +82,8 @@ class Settings extends AbstractHookProvider
         if (!empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY, $section_id))) {
             try {
                 $options = (new MailChimp($api_key))->getListsArray();
-            } catch (\Exception $e) {
+                $options = array_merge(['0' => esc_html__('Select a list', 'email-download')], $options);
+            } catch (Exception $e) {
                 $description = $e->getMessage();
             }
             $field = new SettingField([]);
