@@ -9,5 +9,6 @@ vendor
 wordpress
 composer.lock
 npm-debug.log*
+phpcs-report.xml
 yarn-debug.log*
 yarn-error.log*
