@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dwnload\WpEmailDownload;
 
 use Dwnload\WpEmailDownload\Admin\Settings;
@@ -16,20 +18,19 @@ use TheFrosty\WpUtilities\Plugin\PluginFactory;
 
 /**
  * Class EmailDownload
- *
  * @package Dwnload\WpEmailDownload
  */
 class EmailDownload
 {
 
-    const API_URL = 'https://frosty.media/';
-    const PLUGIN_NAME = 'Email Download';
-    const PLUGIN_ITEM_ID = 11;
-    const ROUTE_NAMESPACE = 'dwnload/v1';
-    const SETTING_API_KEY = 'dwnload_api_key';
+    const string API_URL = 'https://frosty.media/';
+    const string PLUGIN_NAME = 'Email Download';
+    const int PLUGIN_ITEM_ID = 11;
+    const string ROUTE_NAMESPACE = 'dwnload/v1';
+    const string SETTING_API_KEY = 'dwnload_api_key';
 
-    /** @var string $file */
-    private static $file;
+    /** @var string|null $file */
+    private static ?string $file = null;
 
     /**
      * Initiate all class hookups.
@@ -38,7 +39,7 @@ class EmailDownload
     {
         $settings = SettingsApiFactory::create([
             'domain' => 'email-download',
-            'file' => dirname( __DIR__ ) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
+            'file' => dirname(__DIR__) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
             'menu-slug' => 'dwnload-email-download',
             'menu-title' => 'Email Download', // Title found in menu
             'page-title' => 'Email Download Settings', // Title output at top of settings page
