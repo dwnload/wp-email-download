@@ -120,7 +120,7 @@ class Handler implements ShortcodeHandler
                 );
             }
             $html .= '</ul></div>';
-//            return $html;
+            return $html;
         }
 
         wp_enqueue_style(Scripts::SCRIPT_HANDLE);
