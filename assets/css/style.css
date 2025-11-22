@@ -17,6 +17,11 @@
 }
 
 .EmailDownload__input {
+    width: calc(100% - 2rem);
+    padding: 1rem;
+    font-size: inherit;
+    margin: .5rem 0 1rem;
+    border: 1px solid;
     z-index: 1;
 }
 
@@ -28,6 +33,22 @@
     bottom: 0;
     left: 0;
     z-index: 0;
+}
+
+.EmailDownload__button {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 30px;
+    height: 38px;
+    margin: 0;
+    padding: 0 15px 0;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
 
 /**
