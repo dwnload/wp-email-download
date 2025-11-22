@@ -5,9 +5,9 @@ declare(strict_types=1);
 /** @var Api $api */
 
 use Dwnload\WpEmailDownload\Api\Api;
-use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
+use Dwnload\WpEmailDownload\RestApi\SubscriptionController;
 
 if (!($this instanceof Handler)) {
     wp_die(__('Cheatin&#8217; uh?'));
@@ -22,7 +22,7 @@ if (!($this instanceof Handler)) {
             <div class="EmailDownload__notice" style="display: none"><p></p></div>
 
             <form class="EmailDownload__form"
-                  action="" method="post">
+                  action="" method="post" autocomplete="off">
 
                 <div class="EmailDownload__group">
                     <input name="email" class="EmailDownload__input" id="EmailDownload__field-email"
@@ -32,7 +32,8 @@ if (!($this instanceof Handler)) {
                            type="email"
                            placeholder="Email Address"
                            value=""
-                           required>
+                           required
+                           data-1p-ignore>
                     <label for="EmailDownload__field-email" class="EmailDownload__label">Enter your email
                         address</label>
                     <div class="EmailDownload__description">Enter the email address you used to signup for my mailing
