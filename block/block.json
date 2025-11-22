@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "dwnload/wp-email-download",
+	"version": "0.1.0",
+	"title": "Download Form",
+	"category": "widgets",
+	"icon": "email",
+	"description": "Allow users to download any WordPress managed file if they're subscribed to a MailChimp list.",
+	"example": {},
+	"attributes": {
+		"listId": {
+			"type": "string",
+			"default": ""
+		},
+		"listName": {
+			"type": "string",
+			"default": ""
+		},
+		"attachmentId": {
+			"type": "number",
+			"default": 0
+		},
+		"attachmentUrl": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
+	"textdomain": "email-download",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}
