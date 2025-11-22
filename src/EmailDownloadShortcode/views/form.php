@@ -8,7 +8,6 @@ use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
-use Dwnload\WpEmailDownload\Http\Services\RouteService;
 
 if (!($this instanceof Handler)) {
     wp_die(__('Cheatin&#8217; uh?'));
@@ -42,7 +41,7 @@ if (!($this instanceof Handler)) {
                 </div>
 
                 <?php
-                wp_nonce_field(RouteService::NONCE_ACTION); ?>
+                wp_nonce_field('wp_rest'); ?>
 
                 <input name="<?php
                 echo Mailchimp::LIST_ID; ?>"
@@ -58,7 +57,7 @@ if (!($this instanceof Handler)) {
                        value="<?php
                        echo $api->encrypt(
                                $this->getAttribute(Handler::ATTRIBUTE_FILE),
-                               $api->getComputerId()
+                               $api->getComputerId() // @todo combine these <-- --^
                        ); ?>">
 
                 <button class="EmailDownload__button">
