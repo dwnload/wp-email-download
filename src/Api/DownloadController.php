@@ -18,7 +18,6 @@ use WP_REST_Response;
 class DownloadController extends RegisterGetRoute
 {
 
-    const string ENCRYPTION_KEY = 'D0WnL0ADk3Y';
     const string MIME_TYPE = 'application/octet-stream';
     const string NONCE_NAME = 'time';
     const string ROUTE_FILE_PREFIX = '/download/';
@@ -47,7 +46,7 @@ class DownloadController extends RegisterGetRoute
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
                         'validate_callback' => function ($value): bool {
-                            $data = $this->api->decrypt($value, self::ENCRYPTION_KEY);
+                            $data = $this->api->decrypt($value);
                             [$email_address] = explode(Api::ENCRYPTION_DELIMITER, $data, 1);
 
                             return $this->api->isValidEmail($email_address);
@@ -76,7 +75,7 @@ class DownloadController extends RegisterGetRoute
         }
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
-        $value = $this->api->decrypt($data, self::ENCRYPTION_KEY);
+        $value = $this->api->decrypt($data);
         [, , $file_url] = explode(Api::ENCRYPTION_DELIMITER, $value, 3);
 
         // Required parameters (though the 'data' field is required by the route
