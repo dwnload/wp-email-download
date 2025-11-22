@@ -9,7 +9,11 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
+use RuntimeException;
+use TheFrosty\WpUtilities\Api\Hash;
+use Throwable;
 use WP_REST_Request;
+use function random_bytes;
 
 final class Api
 {
@@ -17,7 +21,6 @@ final class Api
     const string ENCRYPTION_DELIMITER = '|';
     const string ENCRYPTION_KEY = 'EMa1LD0WnL08D' . self::ENCRYPTION_DELIMITER;
     const int MAX_SUBMISSIONS = 5;
-    const string SESSION_KEY = 'email_download';
 
     /**
      * Decrypt a string.
@@ -50,6 +53,7 @@ final class Api
     }
 
     /**
+     * Get the Computer ID.
      * @link https://stackoverflow.com/a/18187783/558561
      * @return string
      */
