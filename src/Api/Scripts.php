@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dwnload\WpEmailDownload\Api;
 
 use Dwnload\WpEmailDownload\EmailDownload;
+use Dwnload\WpEmailDownload\RestApi\SubscriptionController;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
 use function filemtime;
 use function plugin_dir_path;
