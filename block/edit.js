@@ -41,7 +41,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	const [ error, setError ] = useState( null );
 
 	useEffect( () => {
-		apiFetch( { path: '/mailchimp-form/v1/lists' } )
+		apiFetch( { path: '/dwnload/v1/lists' } )
 			.then( ( fetchedLists ) => {
 				setLists( fetchedLists );
 				setLoading( false );
