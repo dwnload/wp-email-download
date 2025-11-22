@@ -7,6 +7,8 @@ namespace Dwnload\WpEmailDownload\Api;
 use Dwnload\WpEmailDownload\EmailDownload;
 use Dwnload\WpEmailDownload\Http\Services\RouteService;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
+use function filemtime;
+use function plugin_dir_path;
 use function plugins_url;
 use function wp_register_style;
 
@@ -33,11 +35,16 @@ class Scripts implements WpHooksInterface
      */
     public function registerScripts(): void
     {
-        wp_register_style(self::SCRIPT_HANDLE, plugins_url('assets/css/style.css', EmailDownload::getFile()));
+        wp_register_style(
+            self::SCRIPT_HANDLE,
+            plugins_url('assets/css/style.css', EmailDownload::getFile()),
+            ver: filemtime(plugin_dir_path(EmailDownload::getFile()) . 'assets/css/style.css')
+        );
         wp_register_script(
             self::SCRIPT_HANDLE,
             plugins_url('assets/js/email-download.js', EmailDownload::getFile()),
-            ['jquery']
+            ['jquery'],
+            ver: filemtime(plugin_dir_path(EmailDownload::getFile()) . 'assets/js/email-download.js')
         );
 
         wp_localize_script(self::SCRIPT_HANDLE, self::OBJECT_NAME, [
