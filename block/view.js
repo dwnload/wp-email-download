@@ -55,9 +55,15 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(function (result) {
           if (typeof result.success !== 'undefined' && result.success) {
-            // Success.
             showMessage(notice, result.message || 'Thanks for subscribing!', 'success')
+            emailInput.disabled = true
             emailInput.value = ''
+            setTimeout(function () {
+              submitButton.style.display = 'none'
+            }, 1000)
+            document.location = result.url
+
+            return result
           }
 
           showMessage(notice, result.message, 'warning')
