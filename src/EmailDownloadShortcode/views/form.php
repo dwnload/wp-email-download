@@ -56,10 +56,7 @@ if (!($this instanceof Handler)) {
                 echo SubscriptionController::DOWNLOAD_KEY; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt(
-                               $this->getAttribute(Handler::ATTRIBUTE_FILE),
-                               $api->getComputerId() // @todo combine these <-- --^
-                       ); ?>">
+                       echo $api->encrypt($api->buildDataForFieldId($this->getAttribute(Handler::ATTRIBUTE_FILE))); ?>">
 
                 <button class="EmailDownload__button">
                     Download
