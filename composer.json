@@ -1,6 +1,6 @@
 {
   "name": "dwnload/wp-email-download",
-  "description": "Allow users to download any WordPress managed file if they're subscribed to you MailChimp list",
+  "description": "Allow users to download any WordPress managed file if they're subscribed to a MailChimp list",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "keywords": ["wordpress-plugin", "downloader", "email-subscription", "mailchimp", "wp-api"],
