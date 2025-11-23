@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-/** @var Api $api */
-
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
-use Dwnload\WpEmailDownload\Shortcode\Handler;
 use Dwnload\WpEmailDownload\RestApi\SubscriptionController;
+use Dwnload\WpEmailDownload\Shortcode\Handler;
 
 if (!($this instanceof Handler)) {
-    wp_die(__('Cheatin&#8217; uh?'));
+    wp_die(__('Cheatin&#8217; uh?', 'default')); // phpcs:ignore
 }
 
+// phpcs:disable Generic.WhiteSpace.ScopeIndent.Incorrect
+$api ??= new Api();
 ?>
 <div class="EmailDownload__wrapper clearfix">
     <section>
@@ -48,9 +48,7 @@ if (!($this instanceof Handler)) {
                 echo Mailchimp::LIST_ID; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt(
-                               $this->getAttribute(Handler::ATTRIBUTE_LIST_ID)
-                       ); ?>">
+                       echo $api->encrypt($this->getAttribute(Handler::ATTRIBUTE_LIST_ID)); ?>">
 
                 <input name="<?php
                 echo SubscriptionController::DOWNLOAD_KEY; ?>"

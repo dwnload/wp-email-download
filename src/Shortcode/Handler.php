@@ -27,8 +27,8 @@ class Handler implements HandlerInterface
     use ApiFactory;
     use ShortcodeUiTrait;
 
-    const string ATTRIBUTE_LIST_ID = 'list-id';
-    const string ATTRIBUTE_FILE = 'file';
+    public const string ATTRIBUTE_LIST_ID = 'list-id';
+    public const string ATTRIBUTE_FILE = 'file';
 
     /** @var array $atts */
     protected array $atts = [];
@@ -165,9 +165,10 @@ class Handler implements HandlerInterface
      */
     protected function getMailchimpLists(): array
     {
+        $api_key = Options::getOption(Mailchimp::SETTING_API_KEY);
         $options = ['0' => 'No Lists found.'];
 
-        if (!empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
+        if (!empty($api_key)) {
             try {
                 $options = (new MailChimp($api_key))->getListsArray(true);
                 return array_merge(['0' => esc_html__('Select a list', 'email-download')], $options);
