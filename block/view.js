@@ -1,3 +1,4 @@
+/* global emailDownload */
 document.addEventListener('DOMContentLoaded', function () {
   const forms = document.querySelectorAll('.wp-block-dwnload-wp-email-download form')
 
@@ -12,31 +13,31 @@ document.addEventListener('DOMContentLoaded', function () {
       const notice = document.querySelector('.EmailDownload__notice')
       const nonce = document.querySelector('input[name="_wpnonce"]')
 
-      // Clear previous messages
+      // Clear previous messages.
       if (notice.childNodes.length > 0) {
         notice.innerHTML = ''
       }
 
-      // Validate email
+      // Simple JS email validation, full validation from the request.
       const email = emailInput.value.trim()
       if (!email || !isValidEmail(email)) {
         showMessage(notice, 'Please enter a valid email address.', 'error')
         return
       }
 
-      // Set loading state
+      // Set loading state.
       submitButton.disabled = true
       submitButton.innerHTML = '<span class="spinner"></span> Checking...'
 
-      // Prepare request data
+      // Prepare request data.
       const data = {
         email: email,
         list_id: listIdInput.value,
         file_id: fileIdInput.value
       }
 
-      // Send AJAX request
-      fetch('/wp-json/dwnload/v1/user/' + email, {
+      // Send AJAX REST request.
+      fetch(emailDownload.root + emailDownload.namespace + emailDownload.route + email, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
