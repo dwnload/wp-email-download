@@ -16,6 +16,12 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function check_ajax_referer;
+use function esc_attr;
+use function esc_html;
+use function wp_doing_ajax;
+use function wp_is_rest_endpoint;
+use function wp_verify_nonce;
 
 /**
  * Class SubscriptionController
@@ -45,6 +51,7 @@ class SubscriptionController extends RegisterPostRoute
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
+                        'sanitize_callback' => 'sanitize_email',
                         'validate_callback' => function ($value): bool {
                             return $this->api->isValidEmail($value);
                         },
@@ -55,12 +62,16 @@ class SubscriptionController extends RegisterPostRoute
     }
 
     /**
+     * Parse the rest request and return our response(s).
      * @param WP_REST_Request $request
-     * @return WP_REST_Response
+     * @return WP_Error|WP_REST_Response
      */
-    public function validateUserEmailSubscription(WP_REST_Request $request): WP_REST_Response
+    public function validateUserEmailSubscription(WP_REST_Request $request): WP_Error|WP_REST_Response
     {
-        if (!check_ajax_referer('wp_rest', false, false)) {
+        if (
+            (wp_doing_ajax() && !check_ajax_referer('wp_rest', false, false)) ||
+            (wp_is_rest_endpoint() && !wp_verify_nonce($request->get_header('X-WP-Nonce'), 'wp_rest'))
+        ) {
             return rest_ensure_response(
                 new WP_Error(
                     'nonce_error',
@@ -75,7 +86,7 @@ class SubscriptionController extends RegisterPostRoute
             'date' => date('Y-m-d H:i:s'),
         ];
 
-        // Required parameters (though the 'email' field is required by the route
+        // Required parameters (though the 'email' field is required by the route).
         if (
             empty($request->get_param(self::ROUTE_REQUIRED_FIELD)) ||
             empty($request->get_param(Mailchimp::LIST_ID))
@@ -89,7 +100,7 @@ class SubscriptionController extends RegisterPostRoute
             );
         }
 
-        // This is here for extra protection (not for users) Admins show have their keys set
+        // This is here for extra protection (not for users) Admins should have their keys set!
         if (empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
             return rest_ensure_response(
                 new WP_Error(
@@ -100,7 +111,7 @@ class SubscriptionController extends RegisterPostRoute
             );
         }
 
-        // Count submissions
+        // Count submissions.
         if (!$this->canSubmitForm(time())) {
             return rest_ensure_response(
                 new WP_Error(
@@ -135,7 +146,8 @@ class SubscriptionController extends RegisterPostRoute
                 $data['message'] = 'It seems you\'re not subscribed.';
             }
         } catch (Exception $e) {
-            $data['error'] = esc_html($e->getMessage());
+            $data['code'] = esc_attr($e->getCode());
+            $data['message'] = esc_html($e->getMessage());
         }
 
         return rest_ensure_response($data);
