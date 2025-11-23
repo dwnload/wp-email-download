@@ -169,7 +169,8 @@ class Handler implements HandlerInterface
 
         if (!empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
             try {
-                return (new MailChimp($api_key))->getListsArray(true);
+                $options = (new MailChimp($api_key))->getListsArray(true);
+                return array_merge(['0' => esc_html__('Select a list', 'email-download')], $options);
             } catch (Exception) {
                 return $options;
             }
