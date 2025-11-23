@@ -10,15 +10,16 @@
 
 **Contributors:** [thefrosty](https://github.com/thefrosty)  
 **Tags**: wordpress-plugin, downloader, email-subscription, mailchimp, wp-api  
-**Requires at least:** 6.1  
-**Tested up to**: 6.3  
-**Requires PHP**: 8.0  
-**Stable tag**: master  
+**Requires at least:** 6.7  
+**Tested up to**: 6.8.3  
+**Requires PHP**: 8.3  
+**Stable tag**: develop  
 **License**: GPLv2 or later  
 **License URI**: http://www.gnu.org/licenses/gpl-2.0.html
 
-Mange downloads via WordPress' media manager, and the Email Download shortcode which requires a users to currently be
-subscribed to your MailChimp mailing list designated in the shortcode attribute.
+Mange downloads via WordPress' media manager, and use the Email Download shortcode or block to
+check if a users is currently subscribed to your MailChimp mailing list designated in the shortcode attribute or block
+config.
 
 #### Shortcode
 
@@ -38,5 +39,5 @@ screen, the post object media manager or the shortcode builder).
 To install this plugin, using Composer:
 
 ```
-composer require dwnload/wp-email-download:~0.5
+composer require dwnload/wp-email-download:~0.8
 ```
