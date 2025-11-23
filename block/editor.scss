@@ -1,0 +1,134 @@
+/**
+ * Editor styles for the Mailchimp Subscription Form block
+ */
+
+.mailchimp-subscription-form-editor {
+	.components-placeholder {
+		min-height: 200px;
+		padding: 2rem;
+
+		.configuration-status {
+			text-align: left;
+			margin-top: 1rem;
+
+			ul {
+				list-style: none;
+				padding: 0;
+				margin: 0.5rem 0 0 0;
+
+				li {
+					padding: 0.5rem 0;
+					font-size: 0.95rem;
+					color: #1e1e1e;
+				}
+			}
+		}
+	}
+
+	.form-preview {
+		background: #f9f9f9;
+		border: 2px dashed #ddd;
+		border-radius: 8px;
+		padding: 2rem;
+
+		.preview-header {
+			margin-bottom: 1.5rem;
+
+			h3 {
+				margin: 0 0 1rem 0;
+				font-size: 1.25rem;
+				color: #1e1e1e;
+			}
+
+			.preview-config {
+				background: #fff;
+				padding: 1rem;
+				border-radius: 4px;
+				border: 1px solid #ddd;
+
+				p {
+					margin: 0.5rem 0;
+					font-size: 0.9rem;
+
+					strong {
+						color: #2271b1;
+					}
+				}
+			}
+		}
+
+		.form-mockup {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			margin-bottom: 1rem;
+
+			input {
+				padding: 0.75rem 1rem;
+				border: 2px solid #ddd;
+				border-radius: 4px;
+				font-size: 1rem;
+				background: #fff;
+				opacity: 0.7;
+			}
+
+			button {
+				padding: 0.75rem 2rem;
+				background: #2271b1;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				font-size: 1rem;
+				font-weight: 600;
+				opacity: 0.7;
+				cursor: not-allowed;
+			}
+		}
+
+		.preview-note {
+			margin: 0;
+			padding: 0.75rem;
+			background: #fff3cd;
+			border: 1px solid #ffc107;
+			border-radius: 4px;
+			color: #856404;
+			font-size: 0.9rem;
+			text-align: center;
+		}
+	}
+}
+
+.components-panel__body {
+	.attachment-preview {
+		padding: 1rem;
+		background: #f9f9f9;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+
+		p {
+			margin: 0 0 1rem 0;
+			word-break: break-all;
+
+			a {
+				color: #2271b1;
+				text-decoration: none;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+
+		.button-group {
+			display: flex;
+			gap: 0.5rem;
+		}
+	}
+
+	.description {
+		margin-top: 0.5rem;
+		font-size: 0.9rem;
+		color: #757575;
+		font-style: italic;
+	}
+}

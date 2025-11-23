@@ -2,14 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Dwnload\WpEmailDownload\Api;
+namespace Dwnload\WpEmailDownload\RestApi;
 
+use Dwnload\WpEmailDownload\Api\Api;
+use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\EmailDownload;
-use Dwnload\WpEmailDownload\Http\Services\RegisterGetRoute;
+use TheFrosty\WpUtilities\RestApi\Http\RegisterGetRoute;
 use WP_Error;
 use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
+use function apply_filters;
+use function basename;
+use function current;
+use function esc_attr;
+use function explode;
+use function file_get_contents;
+use function get_post_mime_type;
+use function is_ssl;
+use function json_encode;
+use function nocache_headers;
+use function rest_ensure_response;
+use function time;
+use function urldecode;
 
 /**
  * Class DownloadController
@@ -18,37 +34,30 @@ use WP_REST_Response;
 class DownloadController extends RegisterGetRoute
 {
 
-    const string ENCRYPTION_KEY = 'D0WnL0ADk3Y';
+    use ApiFactory;
+
     const string MIME_TYPE = 'application/octet-stream';
-    const string NONCE_NAME = 'time';
-    const string ROUTE_FILE_PREFIX = '/download/';
+    const string ROUTE_PREFIX = '/download/';
     const string ROUTE_REQUIRED_FIELD = 'data';
 
     /**
-     * DownloadController constructor.
-     * @param Api $api
-     */
-    public function __construct(protected Api $api)
-    {
-    }
-
-    /**
      * Registers a REST API route.
+     * @param WP_REST_Server $server
      * @todo add permission_callback to $args param of registerRoute.
      */
-    public function initializeRoute(): void
+    public function initializeRoute(WP_REST_Server $server): void
     {
         $this->registerRoute(
             EmailDownload::ROUTE_NAMESPACE,
-            self::ROUTE_FILE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
+            self::ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
             [$this, 'validateDownloadableFile'],
             [
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
                         'validate_callback' => function ($value): bool {
-                            $data = $this->api->decrypt($value, self::ENCRYPTION_KEY);
-                            [$email_address] = explode(Api::ENCRYPTION_DELIMITER, $data, 1);
+                            $data = $this->api->decrypt($value);
+                            [$email_address] = explode(Api::ENCRYPTION_DELIMITER, $data);
 
                             return $this->api->isValidEmail($email_address);
                         },
@@ -60,9 +69,9 @@ class DownloadController extends RegisterGetRoute
 
     /**
      * @param WP_REST_Request $request
-     * @return WP_REST_Response
+     * @return WP_Error|WP_REST_Response
      */
-    public function validateDownloadableFile(WP_REST_Request $request): WP_REST_Response
+    public function validateDownloadableFile(WP_REST_Request $request): WP_Error|WP_REST_Response
     {
         // Required parameters (though the 'data' field is required by the route
         if (empty($request->get_param(self::ROUTE_REQUIRED_FIELD))) {
@@ -76,10 +85,25 @@ class DownloadController extends RegisterGetRoute
         }
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
-        $value = $this->api->decrypt($data, self::ENCRYPTION_KEY);
-        [, , $file_url] = explode(Api::ENCRYPTION_DELIMITER, $value, 3);
+        $value = $this->api->decrypt($data);
+        /*
+         * @see SubscriptionController:138
+         * $email_address, $subscriber, $file_url, $file_id, $expires (time)
+         */
+        [, , $file_url, $file_id, $expires] = explode(Api::ENCRYPTION_DELIMITER, $value);
 
-        // Required parameters (though the 'data' field is required by the route
+        // Check on the expiration time.
+        if ($expires < time()) {
+            return rest_ensure_response(
+                new WP_Error(
+                    'download_expired',
+                    "The download has expired.",
+                    ['status' => WP_Http::OK]
+                )
+            );
+        }
+
+        // Check the file URL exists.
         if (empty($file_url)) {
             return rest_ensure_response(
                 new WP_Error(
@@ -90,18 +114,24 @@ class DownloadController extends RegisterGetRoute
             );
         }
 
-        return new WP_REST_Response(file_get_contents($file_url), WP_Http::OK, $this->getDownloadHeaders($file_url));
+        return new WP_REST_Response(
+            file_get_contents($file_url),
+            WP_Http::OK,
+            $this->getDownloadHeaders($file_url, $file_id)
+        );
     }
 
     /**
+     * Set the headers.
      * @param string $file_path
+     * @param int|string $file_id
      * @return array
      */
-    private function getDownloadHeaders(string $file_path): array
+    private function getDownloadHeaders(string $file_path, int|string $file_id): array
     {
         global $is_IE;
 
-        // Get file name
+        // Get file name.
         $file_name = urldecode(basename($file_path));
         $file_size = $this->getFileSize($file_path);
         if (str_contains($file_name, '?')) {
@@ -115,18 +145,20 @@ class DownloadController extends RegisterGetRoute
         } else {
             nocache_headers();
         }
+        $mime = get_post_mime_type($file_id);
         $headers['Pragma'] = 'public';
         $headers['X-Robots-Tag'] = 'noindex, nofollow';
-        $headers['Content-Type'] = self::MIME_TYPE;
+        $headers['Content-Type'] = esc_attr($mime !== false ? $mime : self::MIME_TYPE);
         $headers['Content-Description'] = 'File Transfer';
-        $headers['Content-Disposition'] = "attachment; filename=\"{$file_name}\";";
+        $headers['Content-Disposition'] = "attachment; filename=\"$file_name\";";
         $headers['Content-Transfer-Encoding'] = 'binary';
         $headers['Connection'] = 'close';
         if ($file_size !== -1) {
             $headers['Content-Length'] = $file_size;
             $headers['Accept-Ranges'] = 'bytes';
         }
-        return apply_filters('email_download_force_download_headers', $headers, $file_path);
+
+        return apply_filters('email_download_force_download_headers', $headers, $file_name, $file_path);
     }
 
     /**

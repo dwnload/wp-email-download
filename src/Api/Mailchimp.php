@@ -19,16 +19,7 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
     const string SETTING_LIST_ID = self::LIST_ID;
 
     /**
-     * Create a new instance
-     * @param string $api_key Your MailChimp API key
-     * @throws Exception
-     */
-    public function __construct($api_key)
-    {
-        parent::__construct($api_key);
-    }
-
-    /**
+     * Get the lists in HTML format.
      * @return string
      */
     public function getListsHtml(): string
@@ -39,7 +30,6 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
         if (isset($response['lists'])) {
             $html = '<ul style="margin: 0">';
             foreach ($response['lists'] as $list) {
-                $array[$list['id']] = $list['name'];
                 $html .= "<li>{$list['name']} ({$list['id']})</li>";
             }
             $html .= '</ul>';
@@ -49,21 +39,41 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
     }
 
     /**
+     * Get the lists in array format.
      * @param bool $force Force refresh.
      * @return array
      */
     public function getListsArray(bool $force = false): array
     {
-        $array = [];
+        $data = [];
         $response = $this->getLists($force);
 
         if (isset($response['lists'])) {
             foreach ($response['lists'] as $list) {
-                $array[$list['id']] = $list['name'];
+                $data[$list['id']] = $list['name'];
             }
         }
 
-        return $array;
+        return $data;
+    }
+
+    /**
+     * Get the lists in object format.
+     * @param bool $force Force refresh.
+     * @return array
+     */
+    public function getListsJson(bool $force = false): array
+    {
+        $data = [];
+        $response = $this->getLists($force);
+
+        if (isset($response['lists'])) {
+            foreach ($response['lists'] as $list) {
+                $data[] = ['id' => $list['id'], 'name' => $list['name']];
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -74,7 +84,7 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
     {
         try {
             $reflection = new ReflectionClass(parent::class);
-        } catch (Exception $exception) {
+        } catch (Exception) {
             return [];
         }
         $api_key = $reflection->getProperty('api_key');
@@ -86,7 +96,7 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
                 if (is_array($response) && $force === false) {
                     set_transient($transient, $response, DAY_IN_SECONDS);
                 }
-            } catch (Exception $exception) {
+            } catch (Exception) {
                 return [];
             }
         }

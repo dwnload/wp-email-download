@@ -9,7 +9,7 @@ use WP_REST_Response;
 
 /**
  * Class RestResponse
- * @package Dwnload\WpEmailDownload\Classes\Http
+ * @package Dwnload\WpEmailDownload\Http
  */
 class RestResponse implements WpHooksInterface
 {

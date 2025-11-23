@@ -1,0 +1,19 @@
+{
+    "name": "wp-email-download",
+    "version": "0.1.0",
+    "description": "Allow users to download any WordPress managed file if they're subscribed to a MailChimp list",
+    "license": "GPL-2.0-or-later",
+    "main": "build/index.js",
+    "scripts": {
+        "build": "wp-scripts build --webpack-src-dir=block --webpack-copy-php",
+        "format": "wp-scripts format --webpack-src-dir=block",
+        "lint:css": "wp-scripts lint-style --webpack-src-dir=block",
+        "lint:js": "wp-scripts lint-js --webpack-src-dir=block",
+        "packages-update": "wp-scripts packages-update --webpack-src-dir=block",
+        "plugin-zip": "wp-scripts plugin-zip",
+        "start": "wp-scripts start --webpack-src-dir=block --blocks-manifest"
+    },
+    "devDependencies": {
+        "@wordpress/scripts": "^30.15.0"
+    }
+}

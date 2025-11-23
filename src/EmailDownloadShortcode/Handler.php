@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
 
-use Dwnload\WpEmailDownload\Api\Api;
+use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
-use Dwnload\WpEmailDownload\EmailDownload;
+use Dwnload\WpEmailDownload\Api\Scripts;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
 use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
+use Dwnload\WpSettingsApi\Api\Options;
 use Exception;
 use WP_Error;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
-use Dwnload\WpSettingsApi\Api\Options;
 
 /**
  * Class EmailDownloadHandler
@@ -22,25 +22,17 @@ use Dwnload\WpSettingsApi\Api\Options;
 class Handler implements ShortcodeHandler
 {
 
+    use ApiFactory;
     use ShortcodeUiTrait;
 
     const string ATTRIBUTE_LIST_ID = 'list-id';
     const string ATTRIBUTE_FILE = 'file';
-    const string SCRIPT_HANDLE = 'email-download';
 
     /** @var array $atts */
     protected array $atts = [];
 
     /** @var string $tag */
     protected string $tag;
-
-    /**
-     * Handler constructor.
-     * @param Api $api
-     */
-    public function __construct(protected Api $api)
-    {
-    }
 
     /**
      * Initiate the registration of the Shorcode UI on plugins_loaded
@@ -57,15 +49,6 @@ class Handler implements ShortcodeHandler
                 });
             }
         });
-        add_action('wp_enqueue_scripts', [$this, 'registerScripts']);
-    }
-
-    /**
-     * Register our shortcode output stylesheet.
-     */
-    public function registerScripts(): void
-    {
-        wp_register_style(self::SCRIPT_HANDLE, plugins_url('assets/css/style.css', EmailDownload::getFile()));
     }
 
     /**
@@ -133,12 +116,8 @@ class Handler implements ShortcodeHandler
             return $html;
         }
 
-        if (wp_style_is(self::SCRIPT_HANDLE, 'registered')) {
-            wp_enqueue_style(self::SCRIPT_HANDLE);
-        }
-        if (wp_script_is(self::SCRIPT_HANDLE, 'registered')) {
-            wp_enqueue_script(self::SCRIPT_HANDLE);
-        }
+        wp_enqueue_style(Scripts::SCRIPT_HANDLE);
+        wp_enqueue_script(Scripts::SCRIPT_HANDLE);
 
         ob_start();
         $api = $this->api;

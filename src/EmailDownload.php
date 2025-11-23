@@ -6,9 +6,7 @@ namespace Dwnload\WpEmailDownload;
 
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
-use Dwnload\WpEmailDownload\Api\DownloadController;
 use Dwnload\WpEmailDownload\Api\Scripts;
-use Dwnload\WpEmailDownload\Api\SubscriptionController;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
@@ -50,12 +48,14 @@ class EmailDownload
         $plugin = PluginFactory::create('dwnload-email-download', self::getFile());
         $api = new Api();
         $plugin
-            ->add(new WpSettingsApi($settings))
-            ->add(new Settings())
+            ->add(new Blocks\EmailDownload())
+            ->add(new RestApi\DownloadController($api))
+            ->add(new RestApi\MailchimpLists())
+            ->add(new RestApi\SubscriptionController($api))
             ->add(new Scripts())
-            ->add(new SubscriptionController($api))
-            ->add(new DownloadController($api))
+            ->add(new Settings())
             ->add(new ShortcodeRegistration(new Shortcode('email_to_download', new Handler($api))))
+            ->add(new WpSettingsApi($settings))
             ->initialize();
     }
 
