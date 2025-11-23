@@ -131,13 +131,15 @@ class SubscriptionController extends RegisterPostRoute
 
             // User is subscribed, send them the download!
             if ($chimp->success() && isset($response['id'])) {
+                $file_id = $this->api->getFileIdFromRequest($request);
                 $file_url = $this->api->getDecryptFileIdAttachmentUrl($request);
                 if ($file_url !== '') {
                     $data['success'] = true;
                     $data['url'] = $this->api->buildDownloadRestUrl(
                         $email_address,
                         $subscriber,
-                        $file_url
+                        $file_url,
+                        $file_id
                     );
                 }
                 delete_transient($this->api->getTransientKey());
@@ -169,17 +171,15 @@ class SubscriptionController extends RegisterPostRoute
             ];
         }
 
-        if ($transient['submission_count'] > Api::MAX_SUBMISSIONS ||
-            (
-                $time - $transient['last_submitted'] < HOUR_IN_SECONDS &&
-                $transient['submission_count'] > Api::MAX_SUBMISSIONS
-            )
+        if (
+            $transient['submission_count'] > Api::MAX_SUBMISSIONS ||
+            $time - $transient['last_submitted'] < HOUR_IN_SECONDS
         ) {
             return false;
         }
 
         $transient['last_submitted'] = $time;
-        $transient['submission_count'] = $transient['submission_count'] + 1;
+        ++$transient['submission_count'];
 
         set_transient($key, $transient, DAY_IN_SECONDS);
 
