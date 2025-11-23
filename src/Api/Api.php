@@ -5,52 +5,23 @@ declare(strict_types=1);
 namespace Dwnload\WpEmailDownload\Api;
 
 use Dwnload\WpEmailDownload\EmailDownload;
+use Dwnload\WpEmailDownload\RestApi\DownloadController;
+use Dwnload\WpEmailDownload\RestApi\SubscriptionController;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
-use RuntimeException;
 use TheFrosty\WpUtilities\Api\Hash;
-use Throwable;
 use WP_REST_Request;
-use function random_bytes;
+use function strtotime;
 
 final class Api
 {
 
-    const string ENCRYPTION_DELIMITER = '|';
-    const string ENCRYPTION_KEY = 'EMa1LD0WnL08D' . self::ENCRYPTION_DELIMITER;
+    use Hash;
+
+    const string ENCRYPTION_DELIMITER = '||';
     const int MAX_SUBMISSIONS = 5;
-
-    /**
-     * Decrypt a string.
-     * @param string $data
-     * @param string $encryption_key
-     * @return string
-     */
-    public function decrypt(string $data, string $encryption_key = self::ENCRYPTION_KEY): string
-    {
-        $encrypt_method = "AES-256-CBC";
-        $key = hash('sha256', $encryption_key);
-        $iv = substr(hash('sha256', sprintf('%s_iv', $encryption_key)), 0, 16);
-
-        return openssl_decrypt(base64_decode($data), $encrypt_method, $key, 0, $iv);
-    }
-
-    /**
-     * Encrypt a string.
-     * @param string $data
-     * @param string $encryption_key
-     * @return string
-     */
-    public function encrypt(string $data, string $encryption_key = self::ENCRYPTION_KEY): string
-    {
-        $encrypt_method = "AES-256-CBC";
-        $key = hash('sha256', $encryption_key);
-        $iv = substr(hash('sha256', sprintf('%s_iv', $encryption_key)), 0, 16);
-
-        return base64_encode(openssl_encrypt($data, $encrypt_method, $key, 0, $iv));
-    }
 
     /**
      * Get the Computer ID.
@@ -89,21 +60,23 @@ final class Api
      * @param string $email The current users email address
      * @param string $sub_hash The current users subscription hash from MailChimp
      * @param string $file_url The attachment URL
+     * @param int|string $file_id The attachment ID
      * @return string
      */
-    public function buildDownloadRestUrl(string $email, string $sub_hash, string $file_url): string
+    public function buildDownloadRestUrl(string $email, string $sub_hash, string $file_url, int|string $file_id): string
     {
         $data = $this->encrypt(
             sprintf(
-                '%1$s%4$s%2$s%4$s%3$s',
+                '%1$s%4$s%2$s%4$s%3$s%4$s%5$d%4$s%6$d',
                 $email,
                 $sub_hash,
                 $file_url,
-                self::ENCRYPTION_DELIMITER
-            ),
-            DownloadController::ENCRYPTION_KEY
+                self::ENCRYPTION_DELIMITER,
+                absint($file_id),
+                strtotime('+2 days'),
+            )
         );
-        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_FILE_PREFIX . $data;
+        $path = EmailDownload::ROUTE_NAMESPACE . DownloadController::ROUTE_PREFIX . $data;
 
         return get_rest_url(null, $path);
     }
@@ -115,10 +88,19 @@ final class Api
      */
     public function getFileIdFromRequest(WP_REST_Request $request): int
     {
-        $data = $request->get_param(SubscriptionController::DOWNLOAD_KEY);
-        $file_id = $this->decrypt($data, $this->getComputerId());
+        $data = $this->decrypt($request->get_param(SubscriptionController::DOWNLOAD_KEY));
+        $file_id = explode(self::ENCRYPTION_DELIMITER, $data)[0];
 
         return absint($file_id);
+    }
+
+    /**
+     * @param string $data
+     * @return string
+     */
+    public function buildDataForFieldId(string $data): string
+    {
+        return sprintf('%s%s%s', $data, self::ENCRYPTION_DELIMITER, $this->getComputerId());
     }
 
     /**
