@@ -7,7 +7,7 @@ namespace Dwnload\WpEmailDownload;
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Scripts;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
+use Dwnload\WpEmailDownload\Shortcode\Handler;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Api\Shortcode\Shortcode;

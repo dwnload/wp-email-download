@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
+use Dwnload\WpEmailDownload\Shortcode\Handler;
 use Dwnload\WpEmailDownload\RestApi\SubscriptionController;
 
 if (!($this instanceof Handler)) {

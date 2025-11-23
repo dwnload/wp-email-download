@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
+namespace Dwnload\WpEmailDownload\Shortcode;
 
 use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
@@ -18,8 +18,8 @@ use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
 use function esc_html__;
 
 /**
- * Class EmailDownloadHandler
- * @package Dwnload\WpEmailDownload\ShortcodeApi\EmailDownloadShortcode
+ * Class Handler
+ * @package Dwnload\WpEmailDownload\Shortcode
  */
 class Handler implements HandlerInterface
 {
