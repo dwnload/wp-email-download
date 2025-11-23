@@ -18,6 +18,8 @@ class EmailDownload implements WpHooksInterface
 
     use HooksTrait;
 
+    public const string NAME = 'dwnload/wp-email-download';
+
     public function addHooks(): void
     {
         $this->addAction('init', [$this, 'registerBlock']);
