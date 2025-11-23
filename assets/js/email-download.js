@@ -26,7 +26,7 @@
           $notice.text(text).parent().show()
           $button.attr('disabled', false)
         },
-        fail: function (response) {
+        fail: function () {
           alert('Unknown Error')
         }
       })
