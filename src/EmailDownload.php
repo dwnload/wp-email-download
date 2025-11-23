@@ -8,10 +8,10 @@ use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Scripts;
 use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
+use TheFrosty\WpUtilities\Api\Shortcode\Shortcode;
+use TheFrosty\WpUtilities\Api\Shortcode\ShortcodeRegistrar;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 
 /**
@@ -54,7 +54,7 @@ class EmailDownload
             ->add(new RestApi\SubscriptionController($api))
             ->add(new Scripts())
             ->add(new Settings())
-            ->add(new ShortcodeRegistration(new Shortcode('email_to_download', new Handler($api))))
+            ->add(new ShortcodeRegistrar(new Shortcode('email_to_download', new Handler($api))))
             ->add(new WpSettingsApi($settings))
             ->initialize();
     }
