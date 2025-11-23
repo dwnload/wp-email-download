@@ -7,12 +7,13 @@ namespace Dwnload\WpEmailDownload;
 use Dwnload\WpEmailDownload\Admin\Settings;
 use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\Scripts;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\Handler;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\Shortcode;
-use Dwnload\WpEmailDownload\EmailDownloadShortcode\ShortcodeRegistration;
+use Dwnload\WpEmailDownload\Shortcode\Handler;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
+use TheFrosty\WpUtilities\Api\Shortcode\Shortcode;
+use TheFrosty\WpUtilities\Api\Shortcode\ShortcodeRegistrar;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
+use function get_file_data;
 
 /**
  * Class EmailDownload
@@ -21,11 +22,11 @@ use TheFrosty\WpUtilities\Plugin\PluginFactory;
 class EmailDownload
 {
 
-    const string API_URL = 'https://frosty.media/';
-    const string PLUGIN_NAME = 'Email Download';
-    const int PLUGIN_ITEM_ID = 11;
-    const string ROUTE_NAMESPACE = 'dwnload/v1';
-    const string SETTING_API_KEY = 'dwnload_api_key';
+    public const string API_URL = 'https://frosty.media/';
+    public const string PLUGIN_NAME = 'Email Download';
+    public const int PLUGIN_ITEM_ID = 11;
+    public const string ROUTE_NAMESPACE = 'dwnload/v1';
+    public const string SETTING_API_KEY = 'dwnload_api_key';
 
     /** @var string|null $file */
     private static ?string $file = null;
@@ -39,8 +40,8 @@ class EmailDownload
             'domain' => 'email-download',
             'file' => dirname(__DIR__) . '/vendor/dwnload/wp-settings-api/src', // Path to WPSettingsApi file.
             'menu-slug' => 'dwnload-email-download',
-            'menu-title' => 'Email Download', // Title found in menu
-            'page-title' => 'Email Download Settings', // Title output at top of settings page
+            'menu-title' => 'Email Download', // Title found in menu.
+            'page-title' => 'Email Download Settings', // Title output at top of settings page.
             'prefix' => 'dwnload_email_download',
             'version' => self::getPluginData()['Version'],
         ]);
@@ -54,12 +55,13 @@ class EmailDownload
             ->add(new RestApi\SubscriptionController($api))
             ->add(new Scripts())
             ->add(new Settings())
-            ->add(new ShortcodeRegistration(new Shortcode('email_to_download', new Handler($api))))
+            ->add(new ShortcodeRegistrar(new Shortcode('email_to_download', new Handler($api))))
             ->add(new WpSettingsApi($settings))
             ->initialize();
     }
 
     /**
+     * Set the magic file.
      * @param string $file
      */
     public static function setFile(string $file): void
@@ -68,6 +70,7 @@ class EmailDownload
     }
 
     /**
+     * Get the file.
      * @return string
      */
     public static function getFile(): string
@@ -76,6 +79,7 @@ class EmailDownload
     }
 
     /**
+     * Get the plugin data.
      * @return array
      */
     public static function getPluginData(): array
@@ -95,12 +99,13 @@ class EmailDownload
             'AuthorURI' => 'Author URI',
         ];
 
-        $plugin_data = \get_file_data(self::$file, $default_headers, 'plugin');
+        $plugin_data = get_file_data(self::$file, $default_headers, 'plugin');
 
         return $plugin_data;
     }
 
     /**
+     * Get updater array args.
      * @return array
      */
     private function getUpdaterArgs(): array
@@ -112,10 +117,10 @@ class EmailDownload
             'api_url' => self::API_URL,
             'plugin_file' => self::$file,
             'api_data' => [
-                'version' => $data['Version'], // current version number
-                'license' => $license, // license key (used get_option above to retrieve from DB)
-                'item_name' => $data['Name'], // name of this plugin (matching your EDD Download title)
-                'author' => 'Austin Passy', // author of this plugin
+                'version' => $data['Version'], // current version number.
+                'license' => $license, // license key (used get_option above to retrieve from DB).
+                'item_name' => $data['Name'], // name of this plugin (matching your EDD Download title).
+                'author' => 'Austin Passy', // author of this plugin.
                 'beta' => false,
             ],
             'name' => plugin_basename(self::$file),

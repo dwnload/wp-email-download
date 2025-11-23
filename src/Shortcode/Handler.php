@@ -2,31 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Dwnload\WpEmailDownload\EmailDownloadShortcode;
+namespace Dwnload\WpEmailDownload\Shortcode;
 
 use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\Api\Mailchimp;
 use Dwnload\WpEmailDownload\Api\Scripts;
-use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeHandler;
-use Dwnload\WpEmailDownload\ShortcodeApi\Handler\ShortcodeUiTrait;
 use Dwnload\WpSettingsApi\Api\Options;
 use Exception;
+use TheFrosty\WpUtilities\Api\Shortcode\Handler\HandlerInterface;
+use TheFrosty\WpUtilities\Api\Shortcode\Handler\ShortcodeUiTrait;
 use WP_Error;
+use function array_merge;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
+use function esc_html__;
 
 /**
- * Class EmailDownloadHandler
- * @package Dwnload\WpEmailDownload\ShortcodeApi\EmailDownloadShortcode
+ * Class Handler
+ * @package Dwnload\WpEmailDownload\Shortcode
  */
-class Handler implements ShortcodeHandler
+class Handler implements HandlerInterface
 {
 
     use ApiFactory;
     use ShortcodeUiTrait;
 
-    const string ATTRIBUTE_LIST_ID = 'list-id';
-    const string ATTRIBUTE_FILE = 'file';
+    public const string ATTRIBUTE_LIST_ID = 'list-id';
+    public const string ATTRIBUTE_FILE = 'file';
 
     /** @var array $atts */
     protected array $atts = [];
@@ -60,7 +62,7 @@ class Handler implements ShortcodeHandler
     }
 
     /**
-     * Returns the defaults per the requirement for ShortcodeHandler interface.
+     * Returns the defaults per the requirement for HandlerInterface interface.
      * @return array
      */
     public function getDefaults(): array
@@ -84,11 +86,11 @@ class Handler implements ShortcodeHandler
     /**
      * Returns the html for the height spacer.
      * @param array|string $atts
-     * @param string $content
+     * @param string|null $content
      * @param string $tag
      * @return string
      */
-    public function handler($atts, $content, $tag): string
+    public function handler(array|string $atts, ?string $content, string $tag): string
     {
         $this->atts = $parsed_atts = shortcode_atts($this->getDefaults(), $atts);
 
@@ -158,15 +160,18 @@ class Handler implements ShortcodeHandler
     }
 
     /**
+     * Retrieve our Mailchimp lists.
      * @return array
      */
     protected function getMailchimpLists(): array
     {
+        $api_key = Options::getOption(Mailchimp::SETTING_API_KEY);
         $options = ['0' => 'No Lists found.'];
 
-        if (!empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
+        if (!empty($api_key)) {
             try {
-                return (new MailChimp($api_key))->getListsArray(true);
+                $options = (new MailChimp($api_key))->getListsArray(true);
+                return array_merge(['0' => esc_html__('Select a list', 'email-download')], $options);
             } catch (Exception) {
                 return $options;
             }
