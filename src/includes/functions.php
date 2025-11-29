@@ -26,7 +26,7 @@ function admin_notice(string $message, string $class = 'error'): void
  */
 function version_error(): void
 {
-    admin_notice(php_version_text(), 'error');
+    admin_notice(php_version_text());
 }
 
 /**
