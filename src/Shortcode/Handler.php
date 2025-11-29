@@ -13,11 +13,15 @@ use TheFrosty\WpUtilities\Api\Shortcode\Handler\HandlerInterface;
 use TheFrosty\WpUtilities\Api\Shortcode\Handler\ShortcodeUiTrait;
 use WP_Error;
 use WP_Screen;
+use function absint;
 use function add_action;
 use function array_merge;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
 use function esc_html__;
+use function json_encode;
+use function update_user_option;
+use const Dwnload\WpEmailDownload\SHORTCODE_UI_SLUG;
 
 /**
  * Class Handler
@@ -57,6 +61,14 @@ class Handler implements HandlerInterface
                     });
                 });
             }
+        });
+        add_action('wp_ajax_wped_dismiss_admin_notice', static function (): never {
+            check_ajax_referer(SHORTCODE_UI_SLUG, 'nonce');
+            $user_id = absint($_POST['user_id'] ?? '0');
+            echo json_encode(['user' => get_user_option('dismissed_wp_email_download_notice', $user_id)]);
+            exit;
+            update_user_option($user_id, 'dismissed_wp_email_download_notice', true);
+            exit;
         });
     }
 
