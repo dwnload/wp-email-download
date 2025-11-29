@@ -12,6 +12,8 @@ use Exception;
 use TheFrosty\WpUtilities\Api\Shortcode\Handler\HandlerInterface;
 use TheFrosty\WpUtilities\Api\Shortcode\Handler\ShortcodeUiTrait;
 use WP_Error;
+use WP_Screen;
+use function add_action;
 use function array_merge;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
@@ -46,8 +48,13 @@ class Handler implements HandlerInterface
             try {
                 $this->addActionRegisterShortcodeUi();
             } catch (Exception) {
-                add_action('admin_notices', static function (): void {
-                    admin_notice(missing_shorcode_ui_text(), 'warning');
+                add_action('current_screen', static function (WP_Screen $current_screen): void {
+                    if ($current_screen->base !== 'post' && $current_screen->id !== 'post') {
+                        return;
+                    }
+                    add_action('admin_notices', static function (): void {
+                        admin_notice(missing_shorcode_ui_text(), 'warning');
+                    });
                 });
             }
         });
