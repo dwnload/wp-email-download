@@ -18,6 +18,8 @@ use function wp_nonce_url;
 const PLUGIN_NAME = 'Email Download';
 const SHORTCODE_UI_SLUG = 'shortcode-ui';
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+
 /**
  * Helper function to return admin notice HTML.
  * @param string $message
@@ -31,21 +33,21 @@ function admin_notice(string $message, string $class = 'error'): void
     $nonce = wp_create_nonce(SHORTCODE_UI_SLUG);
     $user_id = get_current_user_id();
     $script = <<<JS
-(function ($) {
-  $(function () {
-    $('div[data-dismissible]').on('click', '.notice-dismiss', function (event) {
-        event.preventDefault()
-        $.post(ajaxurl, {
-          action: 'wped_dismiss_admin_notice',
-          user_id: $user_id,
-          nonce: '$nonce'
-        })
-        $(this).closest('div[data-dismissible]').hide('slow')
-      }
-    )
-  })
-}(jQuery))
-JS;
+        (function ($) {
+          $(function () {
+            $('div[data-dismissible]').on('click', '.notice-dismiss', function (event) {
+                event.preventDefault()
+                $.post(ajaxurl, {
+                  action: 'wped_dismiss_admin_notice',
+                  user_id: $user_id,
+                  nonce: '$nonce'
+                })
+                $(this).closest('div[data-dismissible]').hide('slow')
+              }
+            )
+          })
+        }(jQuery))
+        JS;
 
     printf(
         '<div data-dismissible="" class="notice notice-%s is-dismissible"><p>%s</p><script>%s</script></div>',
@@ -95,7 +97,7 @@ function missing_shorcode_ui_text(): string
 
         return sprintf(
             __(
-                '%s plugin warning: The Shorcode UI plugin is suggested. View the plugin <a href="%s" class="thickbox open-plugin-details-modal">details</a> or <a href="%s">install it now</a>.',
+                '%1$s plugin warning: The Shorcode UI plugin is suggested. View the plugin <a href="%2$s" class="thickbox open-plugin-details-modal">details</a> or <a href="%3$s">install it now</a>.',
                 'email-download'
             ),
             PLUGIN_NAME,

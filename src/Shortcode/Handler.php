@@ -64,7 +64,7 @@ class Handler implements HandlerInterface
         });
         add_action('wp_ajax_wped_dismiss_admin_notice', static function (): never {
             check_ajax_referer(SHORTCODE_UI_SLUG, 'nonce');
-            $user_id = absint($_POST['user_id'] ?? '0');
+            $user_id = absint($_POST['user_id'] ?? '0'); // phpcs:ignore
             echo json_encode(['user' => get_user_option('dismissed_wp_email_download_notice', $user_id)]);
             exit;
             update_user_option($user_id, 'dismissed_wp_email_download_notice', true);
