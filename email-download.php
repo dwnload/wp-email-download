@@ -12,7 +12,6 @@
  * GitHub Plugin URI: https://github.com/dwnload/wp-email-download
  * Primary Branch: master
  * Release Asset: true
- *
  * Copyright (c) 2019 - 2026 Passy.co, LLC (https://passy.co/)
  */
 
@@ -20,15 +19,18 @@ use Dwnload\WpEmailDownload\EmailDownload;
 use function Dwnload\WpEmailDownload\php_version_text;
 
 if (PHP_VERSION_ID >= 80300) {
-    if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    if (
+        file_exists(__DIR__ . '/vendor/autoload.php') &&
+        !defined('Dwnload\WpEmailDownload\PLUGIN_NAME')
+    ) {
         require_once __DIR__ . '/vendor/autoload.php';
     }
 
     EmailDownload::setFile(__FILE__);
     (new EmailDownload())->hookup();
 } else {
-    require __DIR__ . '/src/includes/functions.php';
-    if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI') ) {
+    require_once __DIR__ . '/src/includes/functions.php';
+    if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
         WP_CLI::warning(php_version_text());
     } else {
         add_action('admin_notices', '\Dwnload\WpEmailDownload\version_error');
