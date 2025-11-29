@@ -61,7 +61,7 @@ function missing_shorcode_ui_text(): string
 
         return sprintf(
             __(
-                '%s plugin error: The Shorcode UI plugin is required. View the plugin <a href="%s" class="thickbox open-plugin-details-modal">details</a> or <a href="%s">install it now</a>.',
+                '%s plugin warning: The Shorcode UI plugin is suggested. View the plugin <a href="%s" class="thickbox open-plugin-details-modal">details</a> or <a href="%s">install it now</a>.',
                 'email-download'
             ),
             PLUGIN_NAME,
@@ -71,7 +71,7 @@ function missing_shorcode_ui_text(): string
     }
 
     return sprintf(
-        __('%s plugin error: The Shorcode UI plugin is required.', 'email-download'),
+        __('%s plugin warning: The Shorcode UI plugin is suggested.', 'email-download'),
         PLUGIN_NAME
     );
 }
