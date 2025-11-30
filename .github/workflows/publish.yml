@@ -54,7 +54,7 @@ jobs:
       - name: Run npm
         run: |
           npm install
-          npm build
+          npm run build
 
       - name: Build project for production
         run: |
