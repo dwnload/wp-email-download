@@ -66,7 +66,7 @@ jobs:
       - name: Create artifact
         uses: montudor/action-zip@v1
         with:
-          args: zip -X -r release/wp-email-download.zip . -x *.git* bin** !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
+          args: zip -X -r release/wp-email-download.zip . -x *.git* bin** !block !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -85,7 +85,7 @@ jobs:
         # @see https://github.com/afragen/github-updater/wiki/Settings#release-assets
         uses: montudor/action-zip@v1
         with:
-          args: zip -X -r release/wp-email-download-${{ env.RELEASE_VERSION }}.zip . -x *.git* bin** !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
+          args: zip -X -r release/wp-email-download-${{ env.RELEASE_VERSION }}.zip . -x *.git* bin** !block !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
 
       - name: Upload duplicate to release
         uses: JasonEtco/upload-to-release@master
