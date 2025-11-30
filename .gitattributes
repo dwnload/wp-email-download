@@ -1,0 +1,9 @@
+/.git export-ignore
+/.github export-ignore
+/coverage export-ignore
+/block export-ignore
+/node_modules export-ignore
+/tests export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+phpcs-ruleset.xml export-ignore
