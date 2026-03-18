@@ -69,7 +69,7 @@ jobs:
           args: zip -X -r release/wp-email-download.zip . -x *.git* bin** !block !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wp-email-download
           path: release/wp-email-download.zip
