@@ -14,6 +14,6 @@
         "start": "wp-scripts start --webpack-src-dir=block --blocks-manifest"
     },
     "devDependencies": {
-        "@wordpress/scripts": "33.0.0"
+        "@wordpress/scripts": "34.1.0"
     }
 }
