@@ -3,7 +3,9 @@
  * Plugin Name: Email Download
  * Plugin URI: https://github.com/dwnload/wp-email-download
  * Description: Allow users to download any WordPress managed file if they're subscribed to you MailChimp list.
- * Version: 0.8.1
+ * Version: 0.9
+ * Requires at least: 6.7
+ * Tested up to: 7.1
  * Requires PHP: 8.3
  * Author:  Austin Passy
  * Author URI: https://austin.passy.co
