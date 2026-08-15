@@ -13,6 +13,8 @@ use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use Exception;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
+use function __;
+use function add_action;
 use function esc_html__;
 
 /**
@@ -22,8 +24,8 @@ use function esc_html__;
 class Settings extends AbstractHookProvider
 {
 
-    const string SETTING_ID_S = 'email_download_%s';
-    const string MAILCHIMP_SETTING = 'mailchimp';
+    protected const string SETTING_ID_S = 'email_download_%s';
+    protected const string MAILCHIMP_SETTING = 'mailchimp';
 
     /**
      * Register our callback to the BB WP Settings API action hook
@@ -33,6 +35,18 @@ class Settings extends AbstractHookProvider
     public function addHooks(): void
     {
         add_action(WpSettingsApi::ACTION_PREFIX . 'init', [$this, 'init'], 10, 3);
+        add_action(WpSettingsApi::ACTION_PREFIX . 'after_sanitize_options', static function (array $options): void {
+            $api_key = Options::getOption(Mailchimp::SETTING_API_KEY);
+            if ($api_key !== $options[Mailchimp::SETTING_API_KEY]) {
+                global $wpdb;
+                $wpdb->query(
+                    $wpdb->prepare(
+                        "DELETE FROM $wpdb->options WHERE option_name LIKE %s",
+                        '%' . $wpdb->esc_like('dwnload/mailchimp_lists_') . '%',
+                    )
+                );
+            }
+        });
     }
 
     /**
@@ -61,6 +75,7 @@ class Settings extends AbstractHookProvider
 
         $field = new SettingField([]);
         $field->setName(Mailchimp::SETTING_API_KEY);
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $field->setDescription(
             sprintf(
                 __(
@@ -70,31 +85,41 @@ class Settings extends AbstractHookProvider
                 '-us6'
             )
         );
+        // phpcs:enable
         $field->setLabel(esc_html__('MailChimp API Key', 'email-download'));
         $field->setType('text');
         $field->setSectionId($section_id);
         $field->setObfuscate();
 
-        // Add the field
+        // Add the field.
         $field_manager->addField($field);
 
-        // Lists array
-        if (!empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY, $section_id))) {
+        // Lists array.
+        $api_key = Options::getOption(Mailchimp::SETTING_API_KEY, $section_id);
+        if (!empty($api_key)) {
             try {
                 $options = (new MailChimp($api_key))->getListsArray();
                 $options = array_merge(['0' => esc_html__('Select a list', 'email-download')], $options);
             } catch (Exception $e) {
-                $description = $e->getMessage();
+                $field = new SettingField([]);
+                $field->setName(Mailchimp::SETTING_LIST_ID);
+                $field->setLabel(esc_html__('Error', 'email-download'));
+                $field->setDescription($e->getMessage());
+                $field->setType('html');
+                $field->setSectionId($section_id);
+                $field_manager->addField($field);
+                // We have an error, don't continue.
+                return;
             }
+
             $field = new SettingField([]);
             $field->setName(Mailchimp::SETTING_LIST_ID);
             $field->setLabel(esc_html__('Your Lists', 'email-download'));
-            $field->setDescription($description ?? '');
             $field->setType('select');
-            $field->setOptions($options ?? []);
+            $field->setOptions($options);
             $field->setSectionId($section_id);
 
-            // Add the field
+            // Add the field.
             $field_manager->addField($field);
         }
     }
