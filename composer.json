@@ -25,13 +25,19 @@
     "preferred-install": "dist",
     "sort-packages": true
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/thefrosty/mailchimp-api"
+    }
+  ],
   "require": {
     "php": "~8.3",
     "ext-json": "*",
     "ext-openssl": "*",
-    "drewm/mailchimp-api": "2.5.4",
     "dwnload/wp-settings-api": "^3.11",
     "egulias/email-validator": "~4.0",
+    "thefrosty/mailchimp-api": "^3.0",
     "thefrosty/wp-utilities": "^3.8.6"
   },
   "require-dev": {
