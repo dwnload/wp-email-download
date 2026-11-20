@@ -12,6 +12,7 @@ use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use SensitiveParameter;
+use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Api\Hash;
 use Throwable;
 use WP_REST_Request;
@@ -23,6 +24,10 @@ use function strtotime;
 use function substr;
 use function wp_salt;
 
+/**
+ * Class Api
+ * @package Dwnload\WpEmailDownload\Api
+ */
 final class Api
 {
 
@@ -31,9 +36,9 @@ final class Api
         decrypt as private hashDecrypt;
     }
 
-    const string ENCRYPTION_DELIMITER = '||';
-    const string MAC_SEPARATOR = '.';
-    const int MAX_SUBMISSIONS = 5;
+    public const string ENCRYPTION_DELIMITER = '||';
+    public const string MAC_SEPARATOR = '.';
+    public const int MAX_SUBMISSIONS = 5;
 
     /**
      * Encrypt a string and append an HMAC, so the token can't be modified without the site's salt.
@@ -87,10 +92,11 @@ final class Api
         static $computer_id;
 
         if (!$computer_id) {
-            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
-            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
+            $server = Request::createFromGlobals()->server;
+            $computer_id = (string)$server->get('HTTP_USER_AGENT', '');
+            $computer_id .= (string)$server->get('LOCAL_ADDR', '');
+            $computer_id .= (string)$server->get('LOCAL_PORT', '');
+            $computer_id .= (string)$server->get('REMOTE_ADDR', '');
         }
 
         return $computer_id;
