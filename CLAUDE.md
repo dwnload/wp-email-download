@@ -75,7 +75,7 @@ All routes under namespace `dwnload/v1`:
 
 - **Encryption:** Download URLs are encrypted with `Api::encrypt()` containing `email||sub_hash||file_url||file_id||expires`. Decrypted by `DownloadController`. 2-day expiration.
 - **Rate Limiting:** Transient-based (per computer ID / user agent + IP hash). Max 5 submissions per hour, transient stored 1 day.
-- **Transients:** MailChimp lists cached 1 day (`dwnload/mailchimp_lists_<base64(api_key)>`).
+- **Transients:** MailChimp lists cached 1 day (`dwnload/mailchimp_lists_<sha256(api_key)>`).
 - **Settings:** Stored via `dwnload/wp-settings-api` package. API key stored with option `dwnload_api_key`.
 - **Dependencies:** Uses `the frosty` ecosystem — `wp-utilities`, `wp-settings-api`, `wp-api` — all following the same `AbstractHookProvider` + `PluginFactory` pattern.
 

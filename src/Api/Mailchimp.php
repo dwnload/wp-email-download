@@ -88,7 +88,9 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
             return [];
         }
         $api_key = $reflection->getProperty('api_key');
-        $transient = sprintf('dwnload/mailchimp_lists_%s', base64_encode($api_key->getValue($this)));
+        // Hash the key: base64 is reversible, so the old name stored the API key readable in `wp_options`, object
+        // cache keys and anything that logs transient names.
+        $transient = sprintf('dwnload/mailchimp_lists_%s', hash('sha256', (string)$api_key->getValue($this)));
 
         if (($response = get_transient($transient)) === false) {
             try {
