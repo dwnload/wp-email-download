@@ -16,9 +16,11 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function apply_filters;
 use function check_ajax_referer;
 use function esc_attr;
 use function esc_html;
+use function in_array;
 use function wp_doing_ajax;
 use function wp_is_rest_endpoint;
 use function wp_verify_nonce;
@@ -129,8 +131,24 @@ class SubscriptionController extends RegisterPostRoute
             $subscriber = $chimp->subscriberHash($email_address);
             $response = $chimp->get("lists/$list_id/members/$subscriber");
 
+            /**
+             * The members endpoint also returns unsubscribed, cleaned (bounced), pending (unconfirmed) and
+             * archived contacts, so only allow the statuses that mean "on the list".
+             * @param string[] $statuses Allowed Mailchimp member statuses. Default `['subscribed']`.
+             * @param string $list_id The Mailchimp list ID.
+             */
+            $allowed_statuses = (array)apply_filters(
+                'email_download_allowed_member_statuses',
+                ['subscribed'],
+                $list_id
+            );
+
             // User is subscribed, send them the download!
-            if ($chimp->success() && isset($response['id'])) {
+            if (
+                $chimp->success() &&
+                isset($response['id']) &&
+                in_array($response['status'] ?? '', $allowed_statuses, true)
+            ) {
                 $file_id = $this->api->getFileIdFromRequest($request);
                 $file_url = $this->api->getDecryptFileIdAttachmentUrl($request);
                 if ($file_url !== '') {
