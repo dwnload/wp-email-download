@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\Api;
 
+use DrewM\MailChimp\MailChimp as BaseMailChimp;
 use Exception;
 use ReflectionClass;
 
@@ -11,12 +12,12 @@ use ReflectionClass;
  * Class Mailchimp
  * @package Dwnload\WpEmailDownload\Api
  */
-class Mailchimp extends \DrewM\MailChimp\MailChimp
+class Mailchimp extends BaseMailChimp
 {
 
-    const string LIST_ID = 'list_id';
-    const string SETTING_API_KEY = 'api_key';
-    const string SETTING_LIST_ID = self::LIST_ID;
+    public const string LIST_ID = 'list_id';
+    public const string SETTING_API_KEY = 'api_key';
+    public const string SETTING_LIST_ID = self::LIST_ID;
 
     /**
      * Get the lists in HTML format.
@@ -90,7 +91,8 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
         $api_key = $reflection->getProperty('api_key');
         $transient = sprintf('dwnload/mailchimp_lists_%s', base64_encode($api_key->getValue($this)));
 
-        if (($response = get_transient($transient)) === false) {
+        $response = get_transient($transient);
+        if ($response === false) {
             try {
                 $response = $this->get('lists');
                 if (is_array($response) && $force === false) {
