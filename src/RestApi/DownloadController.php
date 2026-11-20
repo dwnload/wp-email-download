@@ -13,19 +13,26 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function absint;
 use function apply_filters;
 use function basename;
-use function current;
 use function esc_attr;
 use function explode;
 use function file_get_contents;
+use function filesize;
+use function get_attached_file;
 use function get_post_mime_type;
+use function get_post_type;
+use function is_file;
+use function is_numeric;
+use function is_readable;
+use function is_string;
 use function is_ssl;
 use function json_encode;
 use function nocache_headers;
 use function rest_ensure_response;
+use function sanitize_file_name;
 use function time;
-use function urldecode;
 
 /**
  * Class DownloadController
@@ -89,11 +96,13 @@ class DownloadController extends RegisterGetRoute
         /*
          * @see SubscriptionController:138
          * $email_address, $subscriber, $file_url, $file_id, $expires (time)
+         * The `$file_url` is ignored: the file is always resolved from the attachment ID, so a token can never point
+         * the download at an arbitrary path or URL (e.g. `wp-config.php` or an internal host).
          */
-        [, , $file_url, $file_id, $expires] = explode(Api::ENCRYPTION_DELIMITER, $value);
+        [, , , $file_id, $expires] = explode(Api::ENCRYPTION_DELIMITER, $value);
 
         // Check on the expiration time.
-        if ($expires < time()) {
+        if (!is_numeric($expires) || (int)$expires < time()) {
             return rest_ensure_response(
                 new WP_Error(
                     'download_expired',
@@ -103,21 +112,23 @@ class DownloadController extends RegisterGetRoute
             );
         }
 
-        // Check the file URL exists.
-        if (empty($file_url)) {
+        // Only serve files attached to the Media Library.
+        $file_id = absint($file_id);
+        $file_path = get_post_type($file_id) === 'attachment' ? get_attached_file($file_id) : false;
+        if (!is_string($file_path) || !is_file($file_path) || !is_readable($file_path)) {
             return rest_ensure_response(
                 new WP_Error(
                     'missing_file_url',
-                    "The file URL couldn't be processed, please try again.",
+                    "The file couldn't be processed, please try again.",
                     ['status' => WP_Http::OK]
                 )
             );
         }
 
         return new WP_REST_Response(
-            file_get_contents($file_url),
+            file_get_contents($file_path),
             WP_Http::OK,
-            $this->getDownloadHeaders($file_url, $file_id)
+            $this->getDownloadHeaders($file_path, $file_id)
         );
     }
 
@@ -132,11 +143,9 @@ class DownloadController extends RegisterGetRoute
         global $is_IE;
 
         // Get file name.
-        $file_name = urldecode(basename($file_path));
+        // Strip quotes and other characters that could break out of the Content-Disposition header value.
+        $file_name = sanitize_file_name(basename($file_path));
         $file_size = $this->getFileSize($file_path);
-        if (str_contains($file_name, '?')) {
-            $file_name = current(explode('?', $file_name));
-        }
         $headers = [];
         if ($is_IE && is_ssl()) {
             // IE bug prevents download via SSL when Cache Control and Pragma no-cache headers set.
@@ -162,85 +171,14 @@ class DownloadController extends RegisterGetRoute
     }
 
     /**
-     * Gets the filesize of a path or URL.
-     * @access public
+     * Gets the filesize of a local file.
      * @param string $file_path
-     * @return int|string size on success, -1 on failure
+     * @return int size on success, -1 on failure
      */
-    private function getFileSize(string $file_path): int|string
+    private function getFileSize(string $file_path): int
     {
-        [$file_path, $remote_file] = $this->parseFilePath($file_path);
-        if (!empty($file_path)) {
-            if ($remote_file) {
-                $file = wp_remote_head($file_path);
-                if (!is_wp_error($file) && !empty($file['headers']['content-length'])) {
-                    return $file['headers']['content-length'];
-                }
-            } elseif (file_exists($file_path) && ($file_size = filesize($file_path))) {
-                return $file_size;
-            }
-        }
+        $file_size = filesize($file_path);
 
-        return (-1);
-    }
-
-    /**
-     * Parse a file path and return the new path and whether it's remote.
-     * @param string $file_path
-     * @return array
-     */
-    private function parseFilePath(string $file_path): array
-    {
-        $remote_file = true;
-        $parsed_file_path = parse_url($file_path);
-        $wp_uploads = wp_upload_dir();
-        $wp_uploads_dir = $wp_uploads['basedir'];
-        $wp_uploads_url = $wp_uploads['baseurl'];
-        if ((!isset($parsed_file_path['scheme']) ||
-                !in_array($parsed_file_path['scheme'], ['http', 'https', 'ftp',])) &&
-            isset($parsed_file_path['path']) && file_exists($parsed_file_path['path'])
-        ) {
-            /** This is an absolute path */
-            $remote_file = false;
-        } elseif (str_contains($file_path, $wp_uploads_url)) {
-            /** This is a local file given by URL so we need to figure out the path */
-            $remote_file = false;
-            $file_path = trim(str_replace($wp_uploads_url, $wp_uploads_dir, $file_path));
-            $file_path = realpath($file_path);
-        } elseif (is_multisite() && (
-                str_contains($file_path, network_site_url('/', 'http')) ||
-                str_contains($file_path, network_site_url('/', 'https'))
-            )
-        ) {
-            /** This is a local file outside wp-content so figure out the path */
-            $remote_file = false;
-            // Try to replace network url
-            // Try to replace upload URL
-            $file_path = str_replace(
-                [network_site_url('/', 'https'), network_site_url('/', 'http'), $wp_uploads_url],
-                [ABSPATH, ABSPATH, $wp_uploads_dir],
-                $file_path
-            );
-            $file_path = realpath($file_path);
-        } elseif (
-            str_contains($file_path, site_url('/', 'http')) ||
-            str_contains($file_path, site_url('/', 'https'))
-        ) {
-            /** This is a local file outside wp-content so figure out the path */
-            $remote_file = false;
-            $file_path = str_replace(
-                [site_url('/', 'https'), site_url('/', 'http')],
-                [ABSPATH, ABSPATH],
-                $file_path
-            );
-            $file_path = realpath($file_path);
-        } elseif (file_exists(ABSPATH . $file_path)) {
-            /** Path needs an ABSPATH to work */
-            $remote_file = false;
-            $file_path = ABSPATH . $file_path;
-            $file_path = realpath($file_path);
-        }
-
-        return [$file_path, $remote_file];
+        return $file_size !== false ? $file_size : -1;
     }
 }
