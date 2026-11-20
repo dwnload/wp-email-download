@@ -30,7 +30,7 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
         if (isset($response['lists'])) {
             $html = '<ul style="margin: 0">';
             foreach ($response['lists'] as $list) {
-                $html .= "<li>{$list['name']} ({$list['id']})</li>";
+                $html .= sprintf('<li>%s (%s)</li>', esc_html($list['name']), esc_html($list['id']));
             }
             $html .= '</ul>';
         }
