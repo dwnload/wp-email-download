@@ -19,6 +19,7 @@ use WP_REST_Server;
 use function check_ajax_referer;
 use function esc_attr;
 use function esc_html;
+use function is_string;
 use function wp_doing_ajax;
 use function wp_is_rest_endpoint;
 use function wp_verify_nonce;
@@ -125,6 +126,17 @@ class SubscriptionController extends RegisterPostRoute
         try {
             $chimp = new MailChimp($api_key);
             $list_id = $this->api->decrypt($request->get_param(Mailchimp::LIST_ID));
+            // The file must have been rendered for this list (see Api::buildDataForFieldId()).
+            if (!is_string($list_id) || !$this->api->isFileForList($request, $list_id)) {
+                return rest_ensure_response(
+                    new WP_Error(
+                        'invalid_params',
+                        'The form is invalid, please reload the page and try again.',
+                        ['status' => WP_Http::BAD_REQUEST]
+                    )
+                );
+            }
+
             $email_address = sanitize_email($request->get_param(self::ROUTE_REQUIRED_FIELD));
             $subscriber = $chimp->subscriberHash($email_address);
             $response = $chimp->get("lists/$list_id/members/$subscriber");

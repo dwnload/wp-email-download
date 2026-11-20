@@ -73,7 +73,7 @@ echo $wrapper_attributes; ?>>
                 echo SubscriptionController::DOWNLOAD_KEY; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt($api->buildDataForFieldId((string)$attachment_id)); ?>">
+                       echo $api->encrypt($api->buildDataForFieldId((string)$attachment_id, $list_id)); ?>">
 
                 <button type="submit" class="EmailDownload__button">
                     Download
