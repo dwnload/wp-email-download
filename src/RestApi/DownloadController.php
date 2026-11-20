@@ -15,13 +15,14 @@ use WP_REST_Response;
 use WP_REST_Server;
 use function apply_filters;
 use function basename;
+use function count;
 use function current;
 use function esc_attr;
 use function explode;
 use function file_get_contents;
 use function get_post_mime_type;
 use function is_ssl;
-use function json_encode;
+use function is_string;
 use function nocache_headers;
 use function rest_ensure_response;
 use function time;
@@ -36,9 +37,9 @@ class DownloadController extends RegisterGetRoute
 
     use ApiFactory;
 
-    const string MIME_TYPE = 'application/octet-stream';
-    const string ROUTE_PREFIX = '/download/';
-    const string ROUTE_REQUIRED_FIELD = 'data';
+    public const string MIME_TYPE = 'application/octet-stream';
+    public const string ROUTE_PREFIX = '/download/';
+    public const string ROUTE_REQUIRED_FIELD = 'data';
 
     /**
      * Registers a REST API route.
@@ -56,7 +57,11 @@ class DownloadController extends RegisterGetRoute
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
                         'validate_callback' => function ($value): bool {
-                            $data = $this->api->decrypt($value);
+                            $data = $this->api->decrypt((string)$value);
+                            if (!is_string($data)) {
+                                return false;
+                            }
+
                             [$email_address] = explode(Api::ENCRYPTION_DELIMITER, $data);
 
                             return $this->api->isValidEmail($email_address);
@@ -73,7 +78,7 @@ class DownloadController extends RegisterGetRoute
      */
     public function validateDownloadableFile(WP_REST_Request $request): WP_Error|WP_REST_Response
     {
-        // Required parameters (though the 'data' field is required by the route
+        // Required parameters (though the 'data' field is required by the route.
         if (empty($request->get_param(self::ROUTE_REQUIRED_FIELD))) {
             return rest_ensure_response(
                 new WP_Error(
@@ -85,7 +90,17 @@ class DownloadController extends RegisterGetRoute
         }
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
-        $value = $this->api->decrypt($data);
+        $value = $this->api->decrypt((string)$data);
+        if (!is_string($value) || count(explode(Api::ENCRYPTION_DELIMITER, $value)) < 5) {
+            return rest_ensure_response(
+                new WP_Error(
+                    'invalid_download',
+                    'The download link is invalid.',
+                    ['status' => WP_Http::FORBIDDEN]
+                )
+            );
+        }
+
         /*
          * @see SubscriptionController:138
          * $email_address, $subscriber, $file_url, $file_id, $expires (time)
@@ -196,7 +211,8 @@ class DownloadController extends RegisterGetRoute
         $wp_uploads = wp_upload_dir();
         $wp_uploads_dir = $wp_uploads['basedir'];
         $wp_uploads_url = $wp_uploads['baseurl'];
-        if ((!isset($parsed_file_path['scheme']) ||
+        if (
+            (!isset($parsed_file_path['scheme']) ||
                 !in_array($parsed_file_path['scheme'], ['http', 'https', 'ftp',])) &&
             isset($parsed_file_path['path']) && file_exists($parsed_file_path['path'])
         ) {
@@ -207,7 +223,8 @@ class DownloadController extends RegisterGetRoute
             $remote_file = false;
             $file_path = trim(str_replace($wp_uploads_url, $wp_uploads_dir, $file_path));
             $file_path = realpath($file_path);
-        } elseif (is_multisite() && (
+        } elseif (
+            is_multisite() && (
                 str_contains($file_path, network_site_url('/', 'http')) ||
                 str_contains($file_path, network_site_url('/', 'https'))
             )
@@ -215,7 +232,7 @@ class DownloadController extends RegisterGetRoute
             /** This is a local file outside wp-content so figure out the path */
             $remote_file = false;
             // Try to replace network url
-            // Try to replace upload URL
+            // Try to replace upload URL.
             $file_path = str_replace(
                 [network_site_url('/', 'https'), network_site_url('/', 'http'), $wp_uploads_url],
                 [ABSPATH, ABSPATH, $wp_uploads_dir],

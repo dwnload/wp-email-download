@@ -11,17 +11,76 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
+use SensitiveParameter;
+use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Api\Hash;
+use Throwable;
 use WP_REST_Request;
+use function hash_equals;
+use function hash_hmac;
+use function is_string;
+use function strrpos;
 use function strtotime;
+use function substr;
+use function wp_salt;
 
+/**
+ * Class Api
+ * @package Dwnload\WpEmailDownload\Api
+ */
 final class Api
 {
 
-    use Hash;
+    use Hash {
+        encrypt as private hashEncrypt;
+        decrypt as private hashDecrypt;
+    }
 
-    const string ENCRYPTION_DELIMITER = '||';
-    const int MAX_SUBMISSIONS = 5;
+    public const string ENCRYPTION_DELIMITER = '||';
+    public const string MAC_SEPARATOR = '.';
+    public const int MAX_SUBMISSIONS = 5;
+
+    /**
+     * Encrypt a string and append an HMAC, so the token can't be modified without the site's salt.
+     * The encryption alone (AES-256-CBC in wp-utilities <= 3.9.x) isn't authenticated: flipping bits in the IV or
+     * ciphertext changes the decrypted value (e.g. the attachment ID) without the key.
+     * @param mixed $data The value to encrypt.
+     * @param string|null $encryption_key Optional key.
+     * @return string
+     */
+    public function encrypt(
+        #[SensitiveParameter] mixed $data,
+        #[SensitiveParameter] ?string $encryption_key = null
+    ): string {
+        $ciphertext = $this->hashEncrypt($data, $encryption_key);
+
+        return $ciphertext . self::MAC_SEPARATOR . $this->getMac($ciphertext);
+    }
+
+    /**
+     * Verify the HMAC and decrypt a token created by `encrypt()`.
+     * @param string $data The token.
+     * @param string|null $encryption_key Optional key.
+     * @return false|string False when the token is missing its HMAC, was modified, or can't be decrypted.
+     */
+    public function decrypt(string $data, #[SensitiveParameter] ?string $encryption_key = null): false|string
+    {
+        $position = strrpos($data, self::MAC_SEPARATOR);
+        if ($position === false) {
+            return false;
+        }
+
+        $ciphertext = substr($data, 0, $position);
+        if (!hash_equals($this->getMac($ciphertext), substr($data, $position + 1))) {
+            return false;
+        }
+
+        try {
+            return $this->hashDecrypt($ciphertext, $encryption_key);
+        } catch (Throwable) {
+            return false;
+        }
+    }
 
     /**
      * Get the Computer ID.
@@ -33,10 +92,11 @@ final class Api
         static $computer_id;
 
         if (!$computer_id) {
-            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
-            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
+            $server = Request::createFromGlobals()->server;
+            $computer_id = (string)$server->get('HTTP_USER_AGENT', '');
+            $computer_id .= (string)$server->get('LOCAL_ADDR', '');
+            $computer_id .= (string)$server->get('LOCAL_PORT', '');
+            $computer_id .= (string)$server->get('REMOTE_ADDR', '');
         }
 
         return $computer_id;
@@ -88,7 +148,11 @@ final class Api
      */
     public function getFileIdFromRequest(WP_REST_Request $request): int
     {
-        $data = $this->decrypt($request->get_param(SubscriptionController::DOWNLOAD_KEY));
+        $data = $this->decrypt((string)$request->get_param(SubscriptionController::DOWNLOAD_KEY));
+        if (!is_string($data)) {
+            return 0;
+        }
+
         $file_id = explode(self::ENCRYPTION_DELIMITER, $data)[0];
 
         return absint($file_id);
@@ -110,6 +174,16 @@ final class Api
     public function getTransientKey(): string
     {
         return sprintf('email_download_%s', md5($this->getComputerId()));
+    }
+
+    /**
+     * Get the HMAC for a ciphertext.
+     * @param string $ciphertext
+     * @return string
+     */
+    private function getMac(string $ciphertext): string
+    {
+        return hash_hmac('sha256', $ciphertext, wp_salt('secure_auth') . 'email-download/token');
     }
 
     /**
