@@ -11,17 +11,27 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
+use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Api\Hash;
 use WP_REST_Request;
+use function apply_filters;
+use function filter_var;
+use function is_string;
+use function max;
 use function strtotime;
+use const FILTER_VALIDATE_IP;
 
+/**
+ * Class Api
+ * @package Dwnload\WpEmailDownload\Api
+ */
 final class Api
 {
 
     use Hash;
 
-    const string ENCRYPTION_DELIMITER = '||';
-    const int MAX_SUBMISSIONS = 5;
+    public const string ENCRYPTION_DELIMITER = '||';
+    public const int MAX_SUBMISSIONS = 5;
 
     /**
      * Get the Computer ID.
@@ -33,10 +43,11 @@ final class Api
         static $computer_id;
 
         if (!$computer_id) {
-            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
-            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
+            $server = Request::createFromGlobals()->server;
+            $computer_id = (string)$server->get('HTTP_USER_AGENT', '');
+            $computer_id .= (string)$server->get('LOCAL_ADDR', '');
+            $computer_id .= (string)$server->get('LOCAL_PORT', '');
+            $computer_id .= (string)$server->get('REMOTE_ADDR', '');
         }
 
         return $computer_id;
@@ -104,12 +115,37 @@ final class Api
     }
 
     /**
-     * Get the transient key.
+     * Get the rate limit transient key.
+     * Keyed on the client IP only: the user agent is sent by the client, so including it (as the computer ID does)
+     * let anyone reset the limit by changing it on every request.
      * @return string
      */
     public function getTransientKey(): string
     {
-        return sprintf('email_download_%s', md5($this->getComputerId()));
+        return sprintf('email_download_%s', md5($this->getClientIp()));
+    }
+
+    /**
+     * Get the client IP used for rate limiting.
+     * `REMOTE_ADDR` can't be spoofed. Behind a reverse proxy or CDN, return the real client IP via the
+     * `email_download_client_ip` filter (only from a header your proxy sets).
+     * @return string
+     */
+    public function getClientIp(): string
+    {
+        $ip = Request::createFromGlobals()->server->get('REMOTE_ADDR', '');
+        $ip = apply_filters('email_download_client_ip', is_string($ip) ? $ip : '');
+
+        return is_string($ip) && filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
+    }
+
+    /**
+     * Get the maximum form submissions allowed per client IP per hour.
+     * @return int
+     */
+    public function getMaxSubmissions(): int
+    {
+        return max(1, (int)apply_filters('email_download_max_submissions', self::MAX_SUBMISSIONS));
     }
 
     /**
