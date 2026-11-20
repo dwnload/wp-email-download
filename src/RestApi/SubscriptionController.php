@@ -17,8 +17,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use function check_ajax_referer;
-use function esc_attr;
-use function esc_html;
+use function do_action;
 use function wp_doing_ajax;
 use function wp_is_rest_endpoint;
 use function wp_verify_nonce;
@@ -32,9 +31,9 @@ class SubscriptionController extends RegisterPostRoute
 
     use ApiFactory;
 
-    const string ROUTE_PREFIX = '/user/';
-    const string ROUTE_REQUIRED_FIELD = 'email';
-    const string DOWNLOAD_KEY = 'file_id';
+    public const string ROUTE_PREFIX = '/user/';
+    public const string ROUTE_REQUIRED_FIELD = 'email';
+    public const string DOWNLOAD_KEY = 'file_id';
 
     /**
      * Registers a REST API route.
@@ -101,7 +100,8 @@ class SubscriptionController extends RegisterPostRoute
         }
 
         // This is here for extra protection (not for users) Admins should have their keys set!
-        if (empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
+        $api_key = Options::getOption(Mailchimp::SETTING_API_KEY);
+        if (empty($api_key)) {
             return rest_ensure_response(
                 new WP_Error(
                     'missing_api_key',
@@ -148,8 +148,14 @@ class SubscriptionController extends RegisterPostRoute
                 $data['message'] = 'It seems you\'re not subscribed.';
             }
         } catch (Exception $e) {
-            $data['code'] = esc_attr($e->getCode());
-            $data['message'] = esc_html($e->getMessage());
+            // Don't show visitors the raw exception (Mailchimp API errors can include account and list details).
+            $data['message'] = 'Your submission could not be processed, please try again later.';
+            /**
+             * Fires when checking the subscription throws, e.g. to log the error.
+             * @param Exception $e The exception.
+             * @param WP_REST_Request $request The request.
+             */
+            do_action('email_download_subscription_error', $e, $request);
         }
 
         return rest_ensure_response($data);
