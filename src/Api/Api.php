@@ -21,13 +21,17 @@ use function max;
 use function strtotime;
 use const FILTER_VALIDATE_IP;
 
+/**
+ * Class Api
+ * @package Dwnload\WpEmailDownload\Api
+ */
 final class Api
 {
 
     use Hash;
 
-    const string ENCRYPTION_DELIMITER = '||';
-    const int MAX_SUBMISSIONS = 5;
+    public const string ENCRYPTION_DELIMITER = '||';
+    public const int MAX_SUBMISSIONS = 5;
 
     /**
      * Get the Computer ID.
@@ -39,10 +43,11 @@ final class Api
         static $computer_id;
 
         if (!$computer_id) {
-            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
-            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
+            $server = Request::createFromGlobals()->server;
+            $computer_id = (string)$server->get('HTTP_USER_AGENT', '');
+            $computer_id .= (string)$server->get('LOCAL_ADDR', '');
+            $computer_id .= (string)$server->get('LOCAL_PORT', '');
+            $computer_id .= (string)$server->get('REMOTE_ADDR', '');
         }
 
         return $computer_id;
