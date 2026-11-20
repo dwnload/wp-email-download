@@ -23,23 +23,30 @@ on:
   release:
     types: [ published ]
 
+# Uploading release assets needs write access to contents; nothing else.
+permissions:
+  contents: write
+
 jobs:
   Build:
     name: Build and Upload Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set Release Version env
+        # Pass the tag via env, not `${{ }}` in the script, so a tag name can't inject shell commands.
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
-          VERSION=${{ github.event.release.tag_name }}
+          VERSION="$TAG_NAME"
           echo "Release Version: ${VERSION//v}"
           echo "RELEASE_VERSION=${VERSION//v}" >> $GITHUB_ENV
 
       # see https://github.com/shivammathur/setup-php
       - name: Use PHP 8.3
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: 8.3
           coverage: none
@@ -47,7 +54,7 @@ jobs:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
 
@@ -59,23 +66,23 @@ jobs:
 
       - name: Build project for production
         run: |
-          echo "Release Version: ${{ github.event.release.tag_name }}"
+          echo "Release Version: $RELEASE_VERSION"
           composer update --no-dev --optimize-autoloader
           mkdir release
 
       - name: Create artifact
-        uses: montudor/action-zip@v1
+        uses: montudor/action-zip@a8e75c9faefcd80fac3baf53ef40b9b119d5b702 # v1
         with:
           args: zip -X -r release/wp-email-download.zip . -x *.git* bin** !block !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: wp-email-download
           path: release/wp-email-download.zip
 
       - name: Upload to release
-        uses: JasonEtco/upload-to-release@master
+        uses: JasonEtco/upload-to-release@d648f1babf776de9cad881320bd9e9818fc3b262 # master
         with:
           args: release/wp-email-download.zip application/zip
         env:
@@ -83,12 +90,12 @@ jobs:
 
       - name: Duplicate asset for GitHub Updater
         # @see https://github.com/afragen/github-updater/wiki/Settings#release-assets
-        uses: montudor/action-zip@v1
+        uses: montudor/action-zip@a8e75c9faefcd80fac3baf53ef40b9b119d5b702 # v1
         with:
           args: zip -X -r release/wp-email-download-${{ env.RELEASE_VERSION }}.zip . -x *.git* bin** !block !node_modules node_modules/\* .* "*/\.*" *.dist *.xml composer.* package*.json tests** release**
 
       - name: Upload duplicate to release
-        uses: JasonEtco/upload-to-release@master
+        uses: JasonEtco/upload-to-release@d648f1babf776de9cad881320bd9e9818fc3b262 # master
         with:
           args: release/wp-email-download-${{ env.RELEASE_VERSION }}.zip application/zip
         env:
