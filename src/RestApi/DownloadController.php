@@ -21,7 +21,6 @@ use function explode;
 use function file_get_contents;
 use function get_post_mime_type;
 use function is_ssl;
-use function json_encode;
 use function nocache_headers;
 use function rest_ensure_response;
 use function time;
@@ -36,14 +35,13 @@ class DownloadController extends RegisterGetRoute
 
     use ApiFactory;
 
-    const string MIME_TYPE = 'application/octet-stream';
-    const string ROUTE_PREFIX = '/download/';
-    const string ROUTE_REQUIRED_FIELD = 'data';
+    public const string MIME_TYPE = 'application/octet-stream';
+    public const string ROUTE_PREFIX = '/download/';
+    public const string ROUTE_REQUIRED_FIELD = 'data';
 
     /**
      * Registers a REST API route.
      * @param WP_REST_Server $server
-     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute(WP_REST_Server $server): void
     {
@@ -52,6 +50,8 @@ class DownloadController extends RegisterGetRoute
             self::ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
             [$this, 'validateDownloadableFile'],
             [
+                // Public route: the encrypted, expiring token is the authorization.
+                self::ARG_PERMISSION_CALLBACK => '__return_true',
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
@@ -73,7 +73,7 @@ class DownloadController extends RegisterGetRoute
      */
     public function validateDownloadableFile(WP_REST_Request $request): WP_Error|WP_REST_Response
     {
-        // Required parameters (though the 'data' field is required by the route
+        // Required parameters (though the 'data' field is required by the route).
         if (empty($request->get_param(self::ROUTE_REQUIRED_FIELD))) {
             return rest_ensure_response(
                 new WP_Error(
@@ -86,6 +86,7 @@ class DownloadController extends RegisterGetRoute
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
         $value = $this->api->decrypt($data);
+
         /*
          * @see SubscriptionController:138
          * $email_address, $subscriber, $file_url, $file_id, $expires (time)
@@ -196,7 +197,8 @@ class DownloadController extends RegisterGetRoute
         $wp_uploads = wp_upload_dir();
         $wp_uploads_dir = $wp_uploads['basedir'];
         $wp_uploads_url = $wp_uploads['baseurl'];
-        if ((!isset($parsed_file_path['scheme']) ||
+        if (
+            (!isset($parsed_file_path['scheme']) ||
                 !in_array($parsed_file_path['scheme'], ['http', 'https', 'ftp',])) &&
             isset($parsed_file_path['path']) && file_exists($parsed_file_path['path'])
         ) {
@@ -207,7 +209,8 @@ class DownloadController extends RegisterGetRoute
             $remote_file = false;
             $file_path = trim(str_replace($wp_uploads_url, $wp_uploads_dir, $file_path));
             $file_path = realpath($file_path);
-        } elseif (is_multisite() && (
+        } elseif (
+            is_multisite() && (
                 str_contains($file_path, network_site_url('/', 'http')) ||
                 str_contains($file_path, network_site_url('/', 'https'))
             )
@@ -215,7 +218,7 @@ class DownloadController extends RegisterGetRoute
             /** This is a local file outside wp-content so figure out the path */
             $remote_file = false;
             // Try to replace network url
-            // Try to replace upload URL
+            // Try to replace upload URL.
             $file_path = str_replace(
                 [network_site_url('/', 'https'), network_site_url('/', 'http'), $wp_uploads_url],
                 [ABSPATH, ABSPATH, $wp_uploads_dir],

@@ -32,14 +32,13 @@ class SubscriptionController extends RegisterPostRoute
 
     use ApiFactory;
 
-    const string ROUTE_PREFIX = '/user/';
-    const string ROUTE_REQUIRED_FIELD = 'email';
-    const string DOWNLOAD_KEY = 'file_id';
+    public const string ROUTE_PREFIX = '/user/';
+    public const string ROUTE_REQUIRED_FIELD = 'email';
+    public const string DOWNLOAD_KEY = 'file_id';
 
     /**
      * Registers a REST API route.
      * @param WP_REST_Server $server
-     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute(WP_REST_Server $server): void
     {
@@ -48,6 +47,8 @@ class SubscriptionController extends RegisterPostRoute
             self::ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
             [$this, 'validateUserEmailSubscription'],
             [
+                // Public route: visitors are logged out; the nonce, rate limit and Mailchimp check apply.
+                self::ARG_PERMISSION_CALLBACK => '__return_true',
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
@@ -101,7 +102,8 @@ class SubscriptionController extends RegisterPostRoute
         }
 
         // This is here for extra protection (not for users) Admins should have their keys set!
-        if (empty($api_key = Options::getOption(Mailchimp::SETTING_API_KEY))) {
+        $api_key = Options::getOption(Mailchimp::SETTING_API_KEY);
+        if (empty($api_key)) {
             return rest_ensure_response(
                 new WP_Error(
                     'missing_api_key',
