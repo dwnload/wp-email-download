@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\RestApi;
 
-use Dwnload\WpEmailDownload\Api\Api;
 use Dwnload\WpEmailDownload\Api\ApiFactory;
 use Dwnload\WpEmailDownload\Api\MailChimp;
 use Dwnload\WpEmailDownload\EmailDownload;
@@ -16,9 +15,14 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function array_filter;
+use function array_values;
 use function check_ajax_referer;
+use function count;
 use function esc_attr;
 use function esc_html;
+use function is_array;
+use function is_int;
 use function wp_doing_ajax;
 use function wp_is_rest_endpoint;
 use function wp_verify_nonce;
@@ -142,7 +146,6 @@ class SubscriptionController extends RegisterPostRoute
                         $file_id
                     );
                 }
-                delete_transient($this->api->getTransientKey());
             } else {
                 // @todo Make this an option from the settings page.
                 $data['message'] = 'It seems you\'re not subscribed.';
@@ -157,31 +160,28 @@ class SubscriptionController extends RegisterPostRoute
 
     /**
      * Can the user submit the form request?
+     * Allows `Api::getMaxSubmissions()` submissions per client IP in any rolling hour. Successful submissions count
+     * too, otherwise one subscribed address could be used to reset the limit while checking other addresses.
      * @param int $time
      * @return bool
      */
     private function canSubmitForm(int $time): bool
     {
         $key = $this->api->getTransientKey();
-        $transient = get_transient($key);
-        if ($transient === false) {
-            $transient = [
-                'last_submitted' => 0,
-                'submission_count' => 0,
-            ];
-        }
+        $attempts = get_transient($key);
+        $attempts = array_values(
+            array_filter(
+                is_array($attempts) ? $attempts : [],
+                static fn(mixed $attempt): bool => is_int($attempt) && $attempt > $time - HOUR_IN_SECONDS
+            )
+        );
 
-        if (
-            $transient['submission_count'] > Api::MAX_SUBMISSIONS ||
-            $time - $transient['last_submitted'] < HOUR_IN_SECONDS
-        ) {
+        if (count($attempts) >= $this->api->getMaxSubmissions()) {
             return false;
         }
 
-        $transient['last_submitted'] = $time;
-        ++$transient['submission_count'];
-
-        set_transient($key, $transient, DAY_IN_SECONDS);
+        $attempts[] = $time;
+        set_transient($key, $attempts, HOUR_IN_SECONDS);
 
         return true;
     }
