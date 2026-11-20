@@ -16,13 +16,13 @@ $list_name = isset($attributes['listName']) ? esc_html($attributes['listName']) 
 $attachment_id = isset($attributes['attachmentId']) ? absint($attributes['attachmentId']) : 0;
 $attachment_url = isset($attributes['attachmentUrl']) ? esc_url($attributes['attachmentUrl']) : '';
 
-// Don't render if required attributes are missing
+// Don't render if required attributes are missing.
 if (empty($list_id) || empty($attachment_id)) {
     return;
 }
 
 $wrapper_attributes = get_block_wrapper_attributes([
-        'class' => 'EmailDownload__wrapper clearfix mailchimp-subscription-block',
+    'class' => 'EmailDownload__wrapper clearfix mailchimp-subscription-block',
 ]);
 
 ?>
@@ -51,11 +51,11 @@ echo $wrapper_attributes; ?>>
                     <div class="EmailDownload__description">
                         <?php
                         printf(
-                                esc_html__(
-                                        'Enter the same email address you used when signing up to the "%s" list.',
-                                        'email-download'
-                                ),
-                                esc_html($list_name)
+                            esc_html__(
+                                'Enter the same email address you used when signing up to the "%s" list.',
+                                'email-download'
+                            ),
+                            esc_html($list_name)
                         ); ?>
                     </div>
                 </div>
@@ -67,13 +67,13 @@ echo $wrapper_attributes; ?>>
                 echo Mailchimp::LIST_ID; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt($list_id); ?>">
+                        echo $api->encrypt($list_id); ?>">
 
                 <input name="<?php
                 echo SubscriptionController::DOWNLOAD_KEY; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt($api->buildDataForFieldId((string)$attachment_id)); ?>">
+                        echo $api->encrypt($api->buildDataForFieldId((string)$attachment_id, $list_id)); ?>">
 
                 <button type="submit" class="EmailDownload__button">
                     Download

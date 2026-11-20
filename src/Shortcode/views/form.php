@@ -54,7 +54,10 @@ $api ??= new Api();
                 echo SubscriptionController::DOWNLOAD_KEY; ?>"
                        type="hidden"
                        value="<?php
-                       echo $api->encrypt($api->buildDataForFieldId($this->getAttribute(Handler::ATTRIBUTE_FILE))); ?>">
+                       echo $api->encrypt($api->buildDataForFieldId(
+                           $this->getAttribute(Handler::ATTRIBUTE_FILE),
+                           $this->getAttribute(Handler::ATTRIBUTE_LIST_ID)
+                       )); ?>">
 
                 <button class="EmailDownload__button">
                     Download
