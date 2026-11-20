@@ -15,10 +15,12 @@ use WP_REST_Response;
 use WP_REST_Server;
 use function apply_filters;
 use function basename;
+use function count;
 use function current;
 use function esc_attr;
 use function explode;
 use function file_get_contents;
+use function is_string;
 use function get_post_mime_type;
 use function is_ssl;
 use function json_encode;
@@ -56,7 +58,11 @@ class DownloadController extends RegisterGetRoute
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
                         'validate_callback' => function ($value): bool {
-                            $data = $this->api->decrypt($value);
+                            $data = $this->api->decrypt((string)$value);
+                            if (!is_string($data)) {
+                                return false;
+                            }
+
                             [$email_address] = explode(Api::ENCRYPTION_DELIMITER, $data);
 
                             return $this->api->isValidEmail($email_address);
@@ -85,7 +91,17 @@ class DownloadController extends RegisterGetRoute
         }
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
-        $value = $this->api->decrypt($data);
+        $value = $this->api->decrypt((string)$data);
+        if (!is_string($value) || count(explode(Api::ENCRYPTION_DELIMITER, $value)) < 5) {
+            return rest_ensure_response(
+                new WP_Error(
+                    'invalid_download',
+                    'The download link is invalid.',
+                    ['status' => WP_Http::FORBIDDEN]
+                )
+            );
+        }
+
         /*
          * @see SubscriptionController:138
          * $email_address, $subscriber, $file_url, $file_id, $expires (time)
