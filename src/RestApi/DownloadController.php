@@ -43,7 +43,6 @@ class DownloadController extends RegisterGetRoute
     /**
      * Registers a REST API route.
      * @param WP_REST_Server $server
-     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute(WP_REST_Server $server): void
     {
@@ -52,6 +51,8 @@ class DownloadController extends RegisterGetRoute
             self::ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
             [$this, 'validateDownloadableFile'],
             [
+                // Public route: the encrypted, expiring token is the authorization.
+                self::ARG_PERMISSION_CALLBACK => '__return_true',
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,

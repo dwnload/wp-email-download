@@ -28,7 +28,6 @@ class MailchimpLists extends RegisterGetRoute
     /**
      * Registers a REST API route.
      * @param WP_REST_Server $server
-     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute(WP_REST_Server $server): void
     {

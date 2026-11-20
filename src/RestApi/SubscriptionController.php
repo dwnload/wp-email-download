@@ -39,7 +39,6 @@ class SubscriptionController extends RegisterPostRoute
     /**
      * Registers a REST API route.
      * @param WP_REST_Server $server
-     * @todo add permission_callback to $args param of registerRoute.
      */
     public function initializeRoute(WP_REST_Server $server): void
     {
@@ -48,6 +47,8 @@ class SubscriptionController extends RegisterPostRoute
             self::ROUTE_PREFIX . "(?P<" . self::ROUTE_REQUIRED_FIELD . ">\S+)",
             [$this, 'validateUserEmailSubscription'],
             [
+                // Public route: visitors are logged out; the nonce, rate limit and Mailchimp check apply.
+                self::ARG_PERMISSION_CALLBACK => '__return_true',
                 'args' => [
                     self::ROUTE_REQUIRED_FIELD => [
                         'required' => true,
