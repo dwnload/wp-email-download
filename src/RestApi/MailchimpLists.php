@@ -23,7 +23,7 @@ use function rest_ensure_response;
 class MailchimpLists extends RegisterGetRoute
 {
 
-    const string ROUTE_PREFIX = '/lists';
+    public const string ROUTE_PREFIX = '/lists';
 
     /**
      * Registers a REST API route.
