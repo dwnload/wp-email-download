@@ -26,9 +26,8 @@ use function get_post_type;
 use function is_file;
 use function is_numeric;
 use function is_readable;
-use function is_string;
 use function is_ssl;
-use function json_encode;
+use function is_string;
 use function nocache_headers;
 use function rest_ensure_response;
 use function sanitize_file_name;
@@ -43,9 +42,9 @@ class DownloadController extends RegisterGetRoute
 
     use ApiFactory;
 
-    const string MIME_TYPE = 'application/octet-stream';
-    const string ROUTE_PREFIX = '/download/';
-    const string ROUTE_REQUIRED_FIELD = 'data';
+    public const string MIME_TYPE = 'application/octet-stream';
+    public const string ROUTE_PREFIX = '/download/';
+    public const string ROUTE_REQUIRED_FIELD = 'data';
 
     /**
      * Registers a REST API route.
@@ -80,7 +79,7 @@ class DownloadController extends RegisterGetRoute
      */
     public function validateDownloadableFile(WP_REST_Request $request): WP_Error|WP_REST_Response
     {
-        // Required parameters (though the 'data' field is required by the route
+        // Required parameters (though the 'data' field is required by the route.
         if (empty($request->get_param(self::ROUTE_REQUIRED_FIELD))) {
             return rest_ensure_response(
                 new WP_Error(
@@ -93,6 +92,7 @@ class DownloadController extends RegisterGetRoute
 
         $data = $request->get_param(self::ROUTE_REQUIRED_FIELD);
         $value = $this->api->decrypt($data);
+
         /*
          * @see SubscriptionController:138
          * $email_address, $subscriber, $file_url, $file_id, $expires (time)
