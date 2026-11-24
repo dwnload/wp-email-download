@@ -17,6 +17,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use function check_ajax_referer;
+use function do_action;
 use function esc_attr;
 use function esc_html;
 use function is_string;
@@ -161,8 +162,14 @@ class SubscriptionController extends RegisterPostRoute
                 $data['message'] = 'It seems you\'re not subscribed.';
             }
         } catch (Exception $e) {
-            $data['code'] = esc_attr($e->getCode());
-            $data['message'] = esc_html($e->getMessage());
+            // Don't show visitors the raw exception (Mailchimp API errors can include account and list details).
+            $data['message'] = 'Your submission could not be processed, please try again later.';
+            /**
+             * Fires when checking the subscription throws, e.g. to log the error.
+             * @param Exception $e The exception.
+             * @param WP_REST_Request $request The request.
+             */
+            do_action('email_download_subscription_error', $e, $request);
         }
 
         return rest_ensure_response($data);

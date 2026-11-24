@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dwnload\WpEmailDownload\Api;
 
+use DrewM\MailChimp\MailChimp as BaseMailChimp;
 use Exception;
 use ReflectionClass;
 
@@ -11,12 +12,12 @@ use ReflectionClass;
  * Class Mailchimp
  * @package Dwnload\WpEmailDownload\Api
  */
-class Mailchimp extends \DrewM\MailChimp\MailChimp
+class Mailchimp extends BaseMailChimp
 {
 
-    const string LIST_ID = 'list_id';
-    const string SETTING_API_KEY = 'api_key';
-    const string SETTING_LIST_ID = self::LIST_ID;
+    public const string LIST_ID = 'list_id';
+    public const string SETTING_API_KEY = 'api_key';
+    public const string SETTING_LIST_ID = self::LIST_ID;
 
     /**
      * Get the lists in HTML format.
@@ -30,7 +31,7 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
         if (isset($response['lists'])) {
             $html = '<ul style="margin: 0">';
             foreach ($response['lists'] as $list) {
-                $html .= "<li>{$list['name']} ({$list['id']})</li>";
+                $html .= sprintf('<li>%s (%s)</li>', esc_html($list['name']), esc_html($list['id']));
             }
             $html .= '</ul>';
         }
@@ -88,9 +89,12 @@ class Mailchimp extends \DrewM\MailChimp\MailChimp
             return [];
         }
         $api_key = $reflection->getProperty('api_key');
-        $transient = sprintf('dwnload/mailchimp_lists_%s', base64_encode($api_key->getValue($this)));
+        // Hash the key: base64 is reversible, so the old name stored the API key readable in `wp_options`, object
+        // cache keys and anything that logs transient names.
+        $transient = sprintf('dwnload/mailchimp_lists_%s', hash('sha256', (string)$api_key->getValue($this)));
 
-        if (($response = get_transient($transient)) === false) {
+        $response = get_transient($transient);
+        if ($response === false) {
             try {
                 $response = $this->get('lists');
                 if (is_array($response) && $force === false) {
