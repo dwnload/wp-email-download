@@ -13,14 +13,14 @@ use TheFrosty\WpUtilities\Api\Shortcode\Handler\HandlerInterface;
 use TheFrosty\WpUtilities\Api\Shortcode\Handler\ShortcodeUiTrait;
 use WP_Error;
 use WP_Screen;
-use function absint;
 use function add_action;
 use function array_merge;
 use function Dwnload\WpEmailDownload\admin_notice;
 use function Dwnload\WpEmailDownload\missing_shorcode_ui_text;
 use function esc_html__;
-use function json_encode;
+use function get_current_user_id;
 use function update_user_option;
+use function wp_send_json_success;
 use const Dwnload\WpEmailDownload\SHORTCODE_UI_SLUG;
 
 /**
@@ -62,13 +62,11 @@ class Handler implements HandlerInterface
                 });
             }
         });
-        add_action('wp_ajax_wped_dismiss_admin_notice', static function (): never {
+        add_action('wp_ajax_wped_dismiss_admin_notice', static function (): void {
             check_ajax_referer(SHORTCODE_UI_SLUG, 'nonce');
-            $user_id = absint($_POST['user_id'] ?? '0'); // phpcs:ignore
-            echo json_encode(['user' => get_user_option('dismissed_wp_email_download_notice', $user_id)]);
-            exit;
-            update_user_option($user_id, 'dismissed_wp_email_download_notice', true);
-            exit;
+            // Always the current user: the posted user ID was trusted before, and the option was never saved.
+            update_user_option(get_current_user_id(), 'dismissed_wp_email_download_notice', true);
+            wp_send_json_success();
         });
     }
 
