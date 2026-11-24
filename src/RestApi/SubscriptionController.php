@@ -15,14 +15,18 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function apply_filters;
 use function array_filter;
 use function array_values;
 use function check_ajax_referer;
 use function count;
+use function do_action;
 use function esc_attr;
 use function esc_html;
 use function is_array;
 use function is_int;
+use function in_array;
+use function is_string;
 use function wp_doing_ajax;
 use function wp_is_rest_endpoint;
 use function wp_verify_nonce;
@@ -130,12 +134,39 @@ class SubscriptionController extends RegisterPostRoute
         try {
             $chimp = new MailChimp($api_key);
             $list_id = $this->api->decrypt($request->get_param(Mailchimp::LIST_ID));
+            // The file must have been rendered for this list (see Api::buildDataForFieldId()).
+            if (!is_string($list_id) || !$this->api->isFileForList($request, $list_id)) {
+                return rest_ensure_response(
+                    new WP_Error(
+                        'invalid_params',
+                        'The form is invalid, please reload the page and try again.',
+                        ['status' => WP_Http::BAD_REQUEST]
+                    )
+                );
+            }
+
             $email_address = sanitize_email($request->get_param(self::ROUTE_REQUIRED_FIELD));
             $subscriber = $chimp->subscriberHash($email_address);
             $response = $chimp->get("lists/$list_id/members/$subscriber");
 
+            /**
+             * The members endpoint also returns unsubscribed, cleaned (bounced), pending (unconfirmed) and
+             * archived contacts, so only allow the statuses that mean "on the list".
+             * @param string[] $statuses Allowed Mailchimp member statuses. Default `['subscribed']`.
+             * @param string $list_id The Mailchimp list ID.
+             */
+            $allowed_statuses = (array)apply_filters(
+                'email_download_allowed_member_statuses',
+                ['subscribed'],
+                $list_id
+            );
+
             // User is subscribed, send them the download!
-            if ($chimp->success() && isset($response['id'])) {
+            if (
+                $chimp->success() &&
+                isset($response['id']) &&
+                in_array($response['status'] ?? '', $allowed_statuses, true)
+            ) {
                 $file_id = $this->api->getFileIdFromRequest($request);
                 $file_url = $this->api->getDecryptFileIdAttachmentUrl($request);
                 if ($file_url !== '') {
@@ -152,8 +183,14 @@ class SubscriptionController extends RegisterPostRoute
                 $data['message'] = 'It seems you\'re not subscribed.';
             }
         } catch (Exception $e) {
-            $data['code'] = esc_attr($e->getCode());
-            $data['message'] = esc_html($e->getMessage());
+            // Don't show visitors the raw exception (Mailchimp API errors can include account and list details).
+            $data['message'] = 'Your submission could not be processed, please try again later.';
+            /**
+             * Fires when checking the subscription throws, e.g. to log the error.
+             * @param Exception $e The exception.
+             * @param WP_REST_Request $request The request.
+             */
+            do_action('email_download_subscription_error', $e, $request);
         }
 
         return rest_ensure_response($data);
