@@ -15,6 +15,7 @@ use Exception;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
 use function __;
 use function add_action;
+use function esc_html;
 use function esc_html__;
 
 /**
@@ -104,7 +105,7 @@ class Settings extends AbstractHookProvider
                 $field = new SettingField([]);
                 $field->setName(Mailchimp::SETTING_LIST_ID);
                 $field->setLabel(esc_html__('Error', 'email-download'));
-                $field->setDescription($e->getMessage());
+                $field->setDescription(esc_html($e->getMessage()));
                 $field->setType('html');
                 $field->setSectionId($section_id);
                 $field_manager->addField($field);

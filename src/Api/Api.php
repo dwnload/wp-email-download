@@ -11,17 +11,24 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
+use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Api\Hash;
 use WP_REST_Request;
+use function hash_equals;
+use function is_string;
 use function strtotime;
 
+/**
+ * Class Api
+ * @package Dwnload\WpEmailDownload\Api
+ */
 final class Api
 {
 
     use Hash;
 
-    const string ENCRYPTION_DELIMITER = '||';
-    const int MAX_SUBMISSIONS = 5;
+    public const string ENCRYPTION_DELIMITER = '||';
+    public const int MAX_SUBMISSIONS = 5;
 
     /**
      * Get the Computer ID.
@@ -33,10 +40,11 @@ final class Api
         static $computer_id;
 
         if (!$computer_id) {
-            $computer_id = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_ADDR'] ?? '';
-            $computer_id .= $_SERVER['LOCAL_PORT'] ?? '';
-            $computer_id .= $_SERVER['REMOTE_ADDR'] ?? '';
+            $server = Request::createFromGlobals()->server;
+            $computer_id = (string)$server->get('HTTP_USER_AGENT', '');
+            $computer_id .= (string)$server->get('LOCAL_ADDR', '');
+            $computer_id .= (string)$server->get('LOCAL_PORT', '');
+            $computer_id .= (string)$server->get('REMOTE_ADDR', '');
         }
 
         return $computer_id;
@@ -95,12 +103,40 @@ final class Api
     }
 
     /**
-     * @param string $data
+     * Build the file field data. The list ID is included so a file token only works with the list it was
+     * rendered for: otherwise the `list_id` field of a form for a free list could be paired with the `file_id`
+     * field of a form for another list.
+     * @param string $data The attachment ID.
+     * @param string $list_id The Mailchimp list ID the form is for.
      * @return string
      */
-    public function buildDataForFieldId(string $data): string
+    public function buildDataForFieldId(string $data, string $list_id): string
     {
-        return sprintf('%s%s%s', $data, self::ENCRYPTION_DELIMITER, $this->getComputerId());
+        return sprintf(
+            '%1$s%2$s%3$s%2$s%4$s',
+            $data,
+            self::ENCRYPTION_DELIMITER,
+            $list_id,
+            $this->getComputerId()
+        );
+    }
+
+    /**
+     * Does the request's file token belong to the list ID?
+     * @param WP_REST_Request $request
+     * @param string $list_id The decrypted list ID from the request.
+     * @return bool
+     */
+    public function isFileForList(WP_REST_Request $request, string $list_id): bool
+    {
+        $data = $this->decrypt((string)$request->get_param(SubscriptionController::DOWNLOAD_KEY));
+        if (!is_string($data) || $list_id === '') {
+            return false;
+        }
+
+        $parts = explode(self::ENCRYPTION_DELIMITER, $data);
+
+        return isset($parts[1]) && hash_equals($parts[1], $list_id);
     }
 
     /**

@@ -31,7 +31,6 @@ function admin_notice(string $message, string $class = 'error'): void
         return;
     }
     $nonce = wp_create_nonce(SHORTCODE_UI_SLUG);
-    $user_id = get_current_user_id();
     $script = <<<JS
         (function ($) {
           $(function () {
@@ -39,7 +38,6 @@ function admin_notice(string $message, string $class = 'error'): void
                 event.preventDefault()
                 $.post(ajaxurl, {
                   action: 'wped_dismiss_admin_notice',
-                  user_id: $user_id,
                   nonce: '$nonce'
                 })
                 $(this).closest('div[data-dismissible]').hide('slow')
